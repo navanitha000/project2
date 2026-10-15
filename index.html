@@ -1,0 +1,4589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LearnSmart AI — Personalized Learning Assistant</title>
+  <meta name="description" content="A modern, personalized learning chatbot for students covering Hackathons, GitHub, HTML, CSS, JavaScript, and College Projects.">
+  <style>
+    /* =========================================================
+       CSS VARIABLES & THEMES
+       ========================================================= */
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --primary-light: #eef2ff;
+      --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #2563eb 100%);
+      --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+      --bg-body: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --bg-chat: #f8fafc;
+      --border-color: #e2e8f0;
+      --border-subtle: #edf2f7;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --user-bubble-bg: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+      --user-bubble-text: #ffffff;
+      --bot-bubble-bg: #ffffff;
+      --bot-bubble-text: #1e293b;
+      --bot-bubble-border: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+      --shadow-glow: 0 0 20px rgba(79, 70, 229, 0.25);
+      --code-bg: #1e293b;
+      --code-text: #f8fafc;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --warning: #f59e0b;
+      --warning-light: #fffbeb;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-full: 9999px;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body.dark-mode {
+      --bg-body: #0b0f19;
+      --bg-surface: #131c2e;
+      --bg-subtle: #1c273d;
+      --bg-chat: #0e1524;
+      --border-color: #24324d;
+      --border-subtle: #1c273d;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-light: #64748b;
+      --user-bubble-bg: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      --user-bubble-text: #ffffff;
+      --bot-bubble-bg: #172238;
+      --bot-bubble-text: #f1f5f9;
+      --bot-bubble-border: #283754;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.45);
+      --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.55);
+      --shadow-glow: 0 0 25px rgba(99, 102, 241, 0.35);
+      --code-bg: #0b0f19;
+      --code-text: #e2e8f0;
+      --success-light: #064e3b;
+      --warning-light: #451a03;
+      --danger-light: #450a0a;
+    }
+
+    /* =========================================================
+       BASE & RESET
+       ========================================================= */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      line-height: 1.5;
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--text-light);
+      border-radius: var(--radius-full);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    /* =========================================================
+       LAYOUT CONTAINER (APP SHELL)
+       ========================================================= */
+    .app-container {
+      width: 100%;
+      max-width: 1020px;
+      height: 94vh;
+      max-height: 880px;
+      background: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+    .app-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-surface);
+      z-index: 10;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: var(--shadow-glow);
+      flex-shrink: 0;
+    }
+
+    .brand-logo svg {
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .brand-meta {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .badge-rule-based {
+      font-size: 0.65rem;
+      font-weight: 600;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(79, 70, 229, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    body.dark-mode .badge-rule-based {
+      background: rgba(99, 102, 241, 0.15);
+      color: #a5b4fc;
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    .brand-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot-pulse {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--success);
+      position: relative;
+    }
+
+    .status-dot-pulse::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: var(--success);
+      animation: pulse 1.8s infinite;
+      opacity: 0.7;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.8; }
+      70% { transform: scale(2.4); opacity: 0; }
+      100% { transform: scale(2.4); opacity: 0; }
+    }
+
+    /* Navigation & Tools in Header */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      background: var(--bg-subtle);
+      border-radius: var(--radius-full);
+      padding: 3px;
+      border: 1px solid var(--border-color);
+    }
+
+    .nav-tab-btn {
+      background: transparent;
+      border: none;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+
+    .nav-tab-btn:hover {
+      color: var(--text-main);
+    }
+
+    .nav-tab-btn.active {
+      background: var(--bg-surface);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+    body.dark-mode .nav-tab-btn.active {
+      color: #a5b4fc;
+      background: var(--bg-subtle);
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .icon-btn:hover {
+      background: var(--border-color);
+      color: var(--text-main);
+      transform: translateY(-1px);
+    }
+
+    .icon-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+    }
+
+    /* =========================================================
+       MAIN CONTENT VIEWS
+       ========================================================= */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .view-panel {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: var(--bg-surface);
+      overflow-y: auto;
+    }
+
+    .view-panel.active {
+      display: flex;
+    }
+
+    /* =========================================================
+       CHAT VIEW
+       ========================================================= */
+    #chatView {
+      background: var(--bg-chat);
+    }
+
+    .chat-messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      scroll-behavior: smooth;
+    }
+
+    /* Message Rows */
+    .message-row {
+      display: flex;
+      gap: 12px;
+      max-width: 86%;
+      animation: messageSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes messageSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message-row.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message-row.bot {
+      align-self: flex-start;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .avatar.bot-avatar {
+      background: var(--primary-gradient);
+      color: #ffffff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .avatar.user-avatar {
+      background: var(--accent-gradient);
+      color: #ffffff;
+    }
+
+    .message-content-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .message-row.user .message-content-wrap {
+      align-items: flex-end;
+    }
+
+    .message-bubble {
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.92rem;
+      line-height: 1.6;
+      word-break: break-word;
+      position: relative;
+    }
+
+    .message-row.bot .message-bubble {
+      background: var(--bot-bubble-bg);
+      color: var(--bot-bubble-text);
+      border: 1px solid var(--bot-bubble-border);
+      border-top-left-radius: 4px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .message-row.user .message-bubble {
+      background: var(--user-bubble-bg);
+      color: var(--user-bubble-text);
+      border-top-right-radius: 4px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .message-timestamp {
+      font-size: 0.7rem;
+      color: var(--text-light);
+      padding: 0 4px;
+    }
+
+    /* Content Styling inside Bot Messages */
+    .message-bubble p {
+      margin-bottom: 8px;
+    }
+    .message-bubble p:last-child {
+      margin-bottom: 0;
+    }
+
+    .message-bubble ul, .message-bubble ol {
+      padding-left: 20px;
+      margin: 8px 0;
+    }
+
+    .message-bubble li {
+      margin-bottom: 4px;
+    }
+
+    .message-bubble strong {
+      font-weight: 600;
+      color: inherit;
+    }
+
+    .message-bubble code.inline-code {
+      background: var(--bg-subtle);
+      color: var(--primary);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85em;
+    }
+    body.dark-mode .message-bubble code.inline-code {
+      color: #93c5fd;
+    }
+
+    .code-block-wrapper {
+      margin: 10px 0;
+      background: var(--code-bg);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .code-block-header {
+      background: rgba(0, 0, 0, 0.25);
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .copy-code-btn {
+      background: transparent;
+      border: none;
+      color: #cbd5e1;
+      cursor: pointer;
+      font-size: 0.72rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: var(--transition);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .copy-code-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    .code-block {
+      padding: 12px 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.82rem;
+      color: var(--code-text);
+      overflow-x: auto;
+      line-height: 1.5;
+      white-space: pre;
+    }
+
+    /* Structured Cards inside Bot Messages */
+    .bot-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin: 10px 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .bot-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .bot-card-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge-easy { background: var(--success-light); color: var(--success); }
+    .badge-medium { background: var(--warning-light); color: var(--warning); }
+    .badge-hard { background: var(--danger-light); color: var(--danger); }
+
+    /* Follow up suggested pills */
+    .follow-up-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .suggestion-pill {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      color: var(--primary);
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .suggestion-pill:hover {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    /* Welcome Banner & Cards */
+    .welcome-container {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .welcome-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .welcome-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .welcome-text h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .welcome-text p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .welcome-prompt-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .welcome-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
+
+    .welcome-card-btn {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-align: left;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .welcome-card-btn:hover {
+      background: var(--bg-surface);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-icon {
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .card-title {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .card-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 14px;
+      background: var(--bot-bubble-bg);
+      border: 1px solid var(--bot-bubble-border);
+      border-radius: var(--radius-md);
+      width: fit-content;
+      margin-left: 46px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .typing-indicator.active {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--primary);
+      border-radius: 50%;
+      animation: typingBounce 1.4s infinite ease-in-out both;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    .typing-dot:nth-child(3) { animation-delay: 0s; }
+
+    @keyframes typingBounce {
+      0%, 80%, 100% { transform: scale(0); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    /* =========================================================
+       CHAT INPUT BAR
+       ========================================================= */
+    .chat-input-bar {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .input-form {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      position: relative;
+      background: var(--bg-subtle);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+      background: var(--bg-surface);
+    }
+
+    .chat-textarea {
+      width: 100%;
+      border: none;
+      background: transparent;
+      padding: 10px 14px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      color: var(--text-main);
+      resize: none;
+      height: 42px;
+      max-height: 120px;
+      line-height: 1.4;
+      outline: none;
+    }
+
+    .chat-textarea::placeholder {
+      color: var(--text-light);
+    }
+
+    .send-btn {
+      height: 42px;
+      padding: 0 18px;
+      background: var(--primary-gradient);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .send-btn:hover:not(:disabled) {
+      box-shadow: var(--shadow-glow);
+      transform: translateY(-1px);
+    }
+
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .send-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .input-hint-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      color: var(--text-light);
+      padding: 0 4px;
+    }
+
+    .quick-chips-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .quick-chip {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: 0.72rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: var(--transition);
+    }
+
+    .quick-chip:hover {
+      background: var(--bg-subtle);
+      color: var(--text-main);
+      border-color: var(--text-light);
+    }
+
+    /* =========================================================
+       QUIZ VIEW
+       ========================================================= */
+    #quizView {
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    .quiz-container {
+      max-width: 720px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .quiz-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .quiz-header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quiz-title-wrap h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .quiz-title-wrap p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .quiz-category-filter {
+      display: flex;
+      gap: 6px;
+    }
+
+    .category-filter-btn {
+      padding: 4px 10px;
+      font-size: 0.76rem;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-color);
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .category-filter-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .progress-bar-wrap {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-subtle);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--primary-gradient);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .quiz-question-box {
+      margin-bottom: 20px;
+    }
+
+    .question-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    .question-text {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      text-align: left;
+      cursor: pointer;
+      transition: var(--transition);
+      gap: 12px;
+      position: relative;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      transform: translateX(3px);
+    }
+    body.dark-mode .option-btn:hover:not(:disabled) {
+      background: var(--bg-subtle);
+    }
+
+    .option-letter {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .option-btn.correct {
+      border-color: var(--success);
+      background: var(--success-light);
+      color: #065f46;
+      font-weight: 600;
+    }
+    body.dark-mode .option-btn.correct {
+      color: #6ee7b7;
+      background: rgba(16, 185, 129, 0.2);
+    }
+
+    .option-btn.correct .option-letter {
+      background: var(--success);
+      color: #ffffff;
+    }
+
+    .option-btn.incorrect {
+      border-color: var(--danger);
+      background: var(--danger-light);
+      color: #991b1b;
+    }
+    body.dark-mode .option-btn.incorrect {
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.2);
+    }
+
+    .option-btn.incorrect .option-letter {
+      background: var(--danger);
+      color: #ffffff;
+    }
+
+    .quiz-feedback-box {
+      display: none;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      margin-top: 14px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .quiz-feedback-box.correct {
+      display: block;
+      background: var(--success-light);
+      border: 1px solid var(--success);
+      color: #065f46;
+    }
+    body.dark-mode .quiz-feedback-box.correct {
+      color: #a7f3d0;
+      background: rgba(16, 185, 129, 0.15);
+    }
+
+    .quiz-feedback-box.incorrect {
+      display: block;
+      background: var(--danger-light);
+      border: 1px solid var(--danger);
+      color: #991b1b;
+    }
+    body.dark-mode .quiz-feedback-box.incorrect {
+      color: #fecaca;
+      background: rgba(239, 68, 68, 0.15);
+    }
+
+    .quiz-footer-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .btn-quiz-next {
+      padding: 9px 20px;
+      border-radius: var(--radius-md);
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-weight: 600;
+      font-size: 0.86rem;
+      cursor: pointer;
+      display: none;
+      transition: var(--transition);
+    }
+
+    .btn-quiz-next:hover {
+      background: var(--primary-hover);
+    }
+
+    /* Quiz Results Summary Screen */
+    .quiz-results-card {
+      display: none;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+
+    .result-score-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px auto;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .result-score-number {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .result-score-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.9;
+    }
+
+    .quiz-results-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .quiz-results-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .category-breakdown-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .breakdown-item {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px;
+    }
+
+    .breakdown-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .breakdown-score {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-top: 2px;
+    }
+
+    .recommendations-container {
+      margin-top: 24px;
+      text-align: left;
+    }
+
+    .recommendations-heading {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .recommendation-card {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .rec-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .rec-topic-title {
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--text-main);
+    }
+
+    .rec-reason {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .rec-action-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+
+    .rec-activity {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--primary);
+    }
+
+    .btn-start-learning {
+      padding: 5px 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.76rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-start-learning:hover {
+      background: var(--primary-hover);
+    }
+
+    /* =========================================================
+       DASHBOARD VIEW
+       ========================================================= */
+    #dashboardView {
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    .dashboard-container {
+      max-width: 860px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .dashboard-header h2 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .dashboard-header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .kpi-label {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .kpi-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .kpi-subtext {
+      font-size: 0.72rem;
+      color: var(--text-light);
+    }
+
+    .dashboard-split-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    @media (max-width: 768px) {
+      .dashboard-split-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .dash-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .dash-box-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topic-progress-item {
+      margin-bottom: 14px;
+    }
+
+    .topic-progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .topic-track {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-subtle);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .topic-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width 0.5s ease;
+    }
+
+    .topic-bar-html { background: #e34f26; }
+    .topic-bar-css { background: #264de4; }
+    .topic-bar-js { background: #f7df1e; }
+
+    .empty-state-card {
+      text-align: center;
+      padding: 36px 20px;
+      background: var(--bg-subtle);
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--border-color);
+    }
+
+    .empty-state-icon {
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+    }
+
+    .empty-state-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .empty-state-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      max-width: 380px;
+      margin: 0 auto 16px auto;
+    }
+
+    .btn-action-primary {
+      padding: 8px 18px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-action-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    /* =========================================================
+       PROFILE VIEW
+       ========================================================= */
+    #profileView {
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    .profile-container {
+      max-width: 600px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .profile-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .profile-header-banner {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .profile-avatar-large {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .profile-meta h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .profile-meta p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      color: var(--text-main);
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .form-input:focus, .form-select:focus {
+      border-color: var(--primary);
+      background: var(--bg-surface);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+
+    .profile-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .btn-danger-outline {
+      padding: 8px 14px;
+      background: transparent;
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      border-radius: var(--radius-md);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-danger-outline:hover {
+      background: var(--danger);
+      color: white;
+    }
+
+    /* Modal Dialog */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+      animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes modalPop {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .modal-desc {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn-secondary {
+      padding: 8px 16px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      border-radius: var(--radius-md);
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-danger {
+      padding: 8px 16px;
+      background: var(--danger);
+      border: none;
+      color: white;
+      border-radius: var(--radius-md);
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Toast notification */
+    .toast-notice {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text-main);
+      color: var(--bg-surface);
+      padding: 10px 18px;
+      border-radius: var(--radius-full);
+      font-size: 0.84rem;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      z-index: 200;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast-notice.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      body {
+        padding: 0;
+      }
+      .app-container {
+        height: 100vh;
+        max-height: none;
+        border-radius: 0;
+        border: none;
+      }
+      .app-header {
+        padding: 10px 14px;
+      }
+      .brand-title {
+        font-size: 1.05rem;
+      }
+      .nav-tab-btn {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+      }
+      .chat-messages-container {
+        padding: 14px;
+        gap: 14px;
+      }
+      .message-row {
+        max-width: 92%;
+      }
+      .welcome-grid {
+        grid-template-columns: 1fr;
+      }
+      .category-breakdown-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MAIN APP CONTAINER -->
+  <div class="app-container" role="application">
+    
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="brand-logo" aria-hidden="true">
+          <!-- Graduation Cap / Learning Icon -->
+          <svg viewBox="0 0 24 24">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+          </svg>
+        </div>
+        <div class="brand-meta">
+          <div class="brand-title-wrap">
+            <h1 class="brand-title">LearnSmart AI</h1>
+            <span class="badge-rule-based">Rule-Based Assistant</span>
+          </div>
+          <div class="brand-subtitle">
+            <span class="status-dot-pulse" aria-hidden="true"></span>
+            <span>Your personal learning companion &bull; Ready to help you learn</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Navigation Tabs & Controls -->
+      <div class="header-actions">
+        <nav class="nav-tabs" aria-label="Application views">
+          <button class="nav-tab-btn active" data-view="chatView" id="tabChatBtn">
+            <span>💬</span> <span>Chat</span>
+          </button>
+          <button class="nav-tab-btn" data-view="quizView" id="tabQuizBtn">
+            <span>📝</span> <span>Quiz Arena</span>
+          </button>
+          <button class="nav-tab-btn" data-view="dashboardView" id="tabDashboardBtn">
+            <span>📊</span> <span>Dashboard</span>
+          </button>
+          <button class="nav-tab-btn" data-view="profileView" id="tabProfileBtn">
+            <span>👤</span> <span>Profile</span>
+          </button>
+        </nav>
+
+        <!-- Theme Toggle Button -->
+        <button class="icon-btn" id="themeToggleBtn" title="Toggle dark/light theme" aria-label="Toggle theme">
+          <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="5"></circle>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+          </svg>
+        </button>
+
+        <!-- Clear Chat Button -->
+        <button class="icon-btn" id="clearChatBtn" title="Clear conversation" aria-label="Clear chat conversation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT VIEWS -->
+    <div class="content-area">
+
+      <!-- VIEW 1: CHATBOT VIEW -->
+      <section class="view-panel active" id="chatView" aria-label="Chatbot Conversation Area">
+        <div class="chat-messages-container" id="chatMessages" role="log" aria-live="polite">
+          
+          <!-- WELCOME SCREEN (Rendered dynamically or on start) -->
+          <div class="welcome-container" id="welcomeBanner">
+            <div class="welcome-header">
+              <div class="welcome-icon-box">👋</div>
+              <div class="welcome-text">
+                <h2>Hi there! Welcome to LearnSmart AI.</h2>
+                <p>I'm your personal learning assistant. I can help you understand programming concepts, prepare for hackathons, learn GitHub, and build exciting college projects.</p>
+                <p style="margin-top: 6px; font-weight: 500; color: var(--text-main);">What would you like to learn today?</p>
+              </div>
+            </div>
+
+            <div class="welcome-prompt-label">Popular Starting Questions</div>
+            <div class="welcome-grid">
+              <button class="welcome-card-btn" data-query="What is a hackathon?">
+                <span class="card-icon">🚀</span>
+                <div>
+                  <span class="card-title">What is a hackathon?</span>
+                  <span class="card-desc">Format, preparation & winning tips</span>
+                </div>
+              </button>
+
+              <button class="welcome-card-btn" data-query="How do I use GitHub?">
+                <span class="card-icon">🐙</span>
+                <div>
+                  <span class="card-title">How do I use GitHub?</span>
+                  <span class="card-desc">Git basics, repos, and GitHub Pages</span>
+                </div>
+              </button>
+
+              <button class="welcome-card-btn" data-query="Explain HTML.">
+                <span class="card-icon">🌐</span>
+                <div>
+                  <span class="card-title">Explain HTML.</span>
+                  <span class="card-desc">Tags, semantic markup & structure</span>
+                </div>
+              </button>
+
+              <button class="welcome-card-btn" data-query="Explain CSS.">
+                <span class="card-icon">🎨</span>
+                <div>
+                  <span class="card-title">Explain CSS.</span>
+                  <span class="card-desc">Box model, flexbox & responsive styling</span>
+                </div>
+              </button>
+
+              <button class="welcome-card-btn" data-query="What is JavaScript?">
+                <span class="card-icon">⚡</span>
+                <div>
+                  <span class="card-title">What is JavaScript?</span>
+                  <span class="card-desc">Variables, DOM events & logic</span>
+                </div>
+              </button>
+
+              <button class="welcome-card-btn" data-query="Suggest college projects.">
+                <span class="card-icon">💡</span>
+                <div>
+                  <span class="card-title">Suggest college projects.</span>
+                  <span class="card-desc">Capstone, beginner & AI-inspired ideas</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Chat messages stream here -->
+        </div>
+
+        <!-- Typing Indicator -->
+        <div class="typing-indicator" id="typingIndicator" aria-hidden="true">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <span style="font-size: 0.75rem; color: var(--text-muted); margin-left: 6px;">LearnSmart is writing...</span>
+        </div>
+
+        <!-- BOTTOM CHAT INPUT BAR -->
+        <div class="chat-input-bar">
+          <div class="quick-chips-row">
+            <button class="quick-chip" data-query="Suggest beginner-friendly projects">Beginner Projects</button>
+            <button class="quick-chip" data-query="How do I upload a project to GitHub?">Upload to GitHub</button>
+            <button class="quick-chip" data-query="What is Flexbox?">Flexbox vs Grid</button>
+            <button class="quick-chip" data-query="Test my HTML knowledge">HTML Quiz</button>
+            <button class="quick-chip" data-query="What should I learn next?">Learning Path</button>
+          </div>
+
+          <form class="input-form" id="chatForm">
+            <div class="input-wrapper">
+              <textarea 
+                id="userInput" 
+                class="chat-textarea" 
+                placeholder="Ask about HTML, CSS, JavaScript, GitHub, Hackathons, or College Projects..." 
+                rows="1"
+                aria-label="Your message to LearnSmart AI"
+              ></textarea>
+            </div>
+            <button type="submit" class="send-btn" id="sendBtn" aria-label="Send message">
+              <span>Send</span>
+              <svg viewBox="0 0 24 24">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </form>
+
+          <div class="input-hint-row">
+            <span>Press <strong>Enter</strong> to send &bull; <strong>Shift + Enter</strong> for a new line</span>
+            <span>Client-side Rule-Based AI Engine &bull; Private & Secure</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: QUIZ ARENA VIEW -->
+      <section class="view-panel" id="quizView" aria-label="Interactive Learning Quiz">
+        <div class="quiz-container">
+          
+          <!-- QUIZ IN-PROGRESS CARD -->
+          <div class="quiz-card" id="quizActiveCard">
+            <div class="quiz-header-bar">
+              <div class="quiz-title-wrap">
+                <h3>Interactive Learning Quiz</h3>
+                <p>Test your knowledge in HTML, CSS, and JavaScript with instant feedback</p>
+              </div>
+
+              <!-- Topic filter for quiz -->
+              <div class="quiz-category-filter">
+                <button class="category-filter-btn active" data-cat="all">All Topics</button>
+                <button class="category-filter-btn" data-cat="html">HTML</button>
+                <button class="category-filter-btn" data-cat="css">CSS</button>
+                <button class="category-filter-btn" data-cat="javascript">JavaScript</button>
+              </div>
+            </div>
+
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-fill" id="quizProgressBar"></div>
+            </div>
+
+            <div class="quiz-question-box">
+              <span class="question-badge" id="quizCategoryBadge">Topic: HTML</span>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;" id="quizCounterText">Question 1 of 10</div>
+              <h4 class="question-text" id="quizQuestionText">Loading question...</h4>
+            </div>
+
+            <div class="options-grid" id="quizOptionsContainer">
+              <!-- Options injected dynamically -->
+            </div>
+
+            <div class="quiz-feedback-box" id="quizFeedbackBox">
+              <!-- Explanation injected here -->
+            </div>
+
+            <div class="quiz-footer-actions">
+              <button class="btn-quiz-next" id="quizNextBtn">Next Question &rarr;</button>
+            </div>
+          </div>
+
+          <!-- QUIZ RESULTS SCREEN -->
+          <div class="quiz-results-card" id="quizResultsCard">
+            <div class="result-score-circle">
+              <span class="result-score-number" id="resultPercentage">80%</span>
+              <span class="result-score-label">Score</span>
+            </div>
+
+            <h3 class="quiz-results-title" id="resultHeadline">Great Job!</h3>
+            <p class="quiz-results-subtitle" id="resultSummary">You scored 8 out of 10 questions correctly.</p>
+
+            <div class="category-breakdown-grid">
+              <div class="breakdown-item">
+                <div class="breakdown-label">HTML Performance</div>
+                <div class="breakdown-score" id="breakdownHtmlScore">--</div>
+              </div>
+              <div class="breakdown-item">
+                <div class="breakdown-label">CSS Performance</div>
+                <div class="breakdown-score" id="breakdownCssScore">--</div>
+              </div>
+              <div class="breakdown-item">
+                <div class="breakdown-label">JavaScript Performance</div>
+                <div class="breakdown-score" id="breakdownJsScore">--</div>
+              </div>
+            </div>
+
+            <!-- Personalized Recommendations based on score -->
+            <div class="recommendations-container">
+              <h4 class="recommendations-heading">
+                <span>🎯</span> Recommended Next Steps For You
+              </h4>
+              <div id="quizRecommendationsList">
+                <!-- Recommendations cards injected dynamically -->
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 12px; margin-top: 24px;">
+              <button class="btn-action-primary" id="btnRestartQuiz">
+                <span>🔄</span> Retake Quiz
+              </button>
+              <button class="btn-secondary" id="btnQuizBackToChat">
+                <span>💬</span> Ask LearnSmart AI
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- VIEW 3: DASHBOARD VIEW -->
+      <section class="view-panel" id="dashboardView" aria-label="Learning Progress Dashboard">
+        <div class="dashboard-container">
+          <div class="dashboard-header">
+            <div>
+              <h2>Learning Dashboard</h2>
+              <p>Real-time analytics calculated from your practice tests and learning queries</p>
+            </div>
+            <button class="btn-action-primary" id="btnDashTakeQuiz">
+              <span>✍️</span> Take a Practice Quiz
+            </button>
+          </div>
+
+          <!-- KPI Metric Cards -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <span class="kpi-label">Questions Answered</span>
+              <span class="kpi-value" id="kpiQuestionsCount">0</span>
+              <span class="kpi-subtext">Total quiz items attempted</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-label">Quizzes Completed</span>
+              <span class="kpi-value" id="kpiQuizzesCount">0</span>
+              <span class="kpi-subtext">Saved test sessions</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-label">Average Quiz Score</span>
+              <span class="kpi-value" id="kpiAverageScore">0%</span>
+              <span class="kpi-subtext">Across all completed quizzes</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-label">Strongest Topic</span>
+              <span class="kpi-value" style="font-size: 1.25rem; color: var(--success);" id="kpiStrongestTopic">--</span>
+              <span class="kpi-subtext">Highest accuracy rate</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-label">Needs Improvement</span>
+              <span class="kpi-value" style="font-size: 1.25rem; color: var(--danger);" id="kpiWeakestTopic">--</span>
+              <span class="kpi-subtext">Focus your revision here</span>
+            </div>
+          </div>
+
+          <!-- Main Split Section: Topic Mastery vs Personalized Recommendations -->
+          <div class="dashboard-split-grid">
+            
+            <!-- Box 1: Topic Mastery -->
+            <div class="dash-box">
+              <div class="dash-box-title">
+                <span>Topic Mastery Progress</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">Based on Quiz Results</span>
+              </div>
+
+              <div id="dashMasteryContent">
+                <div class="topic-progress-item">
+                  <div class="topic-progress-header">
+                    <span>HTML Fundamentals</span>
+                    <span id="masteryHtmlPct">0%</span>
+                  </div>
+                  <div class="topic-track">
+                    <div class="topic-bar-fill topic-bar-html" id="masteryHtmlBar" style="width: 0%;"></div>
+                  </div>
+                </div>
+
+                <div class="topic-progress-item">
+                  <div class="topic-progress-header">
+                    <span>CSS Styling & Layout</span>
+                    <span id="masteryCssPct">0%</span>
+                  </div>
+                  <div class="topic-track">
+                    <div class="topic-bar-fill topic-bar-css" id="masteryCssBar" style="width: 0%;"></div>
+                  </div>
+                </div>
+
+                <div class="topic-progress-item">
+                  <div class="topic-progress-header">
+                    <span>JavaScript Logic & DOM</span>
+                    <span id="masteryJsPct">0%</span>
+                  </div>
+                  <div class="topic-track">
+                    <div class="topic-bar-fill topic-bar-js" id="masteryJsBar" style="width: 0%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="dashMasteryEmpty" class="empty-state-card" style="display: none; margin-top: 10px;">
+                <div class="empty-state-icon">📊</div>
+                <div class="empty-state-title">No Quiz Data Yet</div>
+                <div class="empty-state-desc">Complete at least one quiz to view your topic mastery breakdown and pinpoint areas for growth.</div>
+              </div>
+            </div>
+
+            <!-- Box 2: Recommended Next Steps -->
+            <div class="dash-box">
+              <div class="dash-box-title">
+                <span>Personalized Learning Advice</span>
+                <span class="badge-rule-based">Rule-Based</span>
+              </div>
+
+              <div id="dashRecommendationsList">
+                <!-- Dynamically generated recommendation cards -->
+              </div>
+
+              <div id="dashRecommendationsEmpty" class="empty-state-card" style="display: none;">
+                <div class="empty-state-icon">🎯</div>
+                <div class="empty-state-title">Ready for Your Assessment</div>
+                <div class="empty-state-desc">Take a quiz or select your favorite learning tracks in your profile to generate targeted study advice.</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Educational Disclaimer Footer -->
+          <div style="font-size: 0.76rem; color: var(--text-light); text-align: center; margin-top: 10px;">
+            💡 <em>Rule-Based Educational Engine: Recommendations and analytics are calculated directly from your stored quiz performance and chosen preferences in localStorage. No external AI APIs or predictive black-box algorithms are used.</em>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- VIEW 4: STUDENT PROFILE VIEW -->
+      <section class="view-panel" id="profileView" aria-label="Student Profile and Preferences">
+        <div class="profile-container">
+          <div class="profile-card">
+            
+            <div class="profile-header-banner">
+              <div class="profile-avatar-large" id="profileDisplayAvatar">🎓</div>
+              <div class="profile-meta">
+                <h3 id="profileDisplayName">Student Learner</h3>
+                <p id="profileDisplayGoal">Focus: Full-Stack Web Development</p>
+              </div>
+            </div>
+
+            <form id="profileForm">
+              <div class="form-group">
+                <label for="studentNameInput" class="form-label">Your Name or Nickname</label>
+                <input type="text" id="studentNameInput" class="form-input" placeholder="e.g., Alex Johnson" maxlength="32">
+              </div>
+
+              <div class="form-group">
+                <label for="studentGoalSelect" class="form-label">Primary Learning Goal</label>
+                <select id="studentGoalSelect" class="form-select">
+                  <option value="webdev">Full-Stack Web Development (HTML, CSS, JS)</option>
+                  <option value="hackathon">Hackathon Preparation & Rapid Prototyping</option>
+                  <option value="college">College Capstone / Final Year Project</option>
+                  <option value="git">GitHub & Version Control Mastery</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="studentLevelSelect" class="form-label">Self-Assessed Experience Level</label>
+                <select id="studentLevelSelect" class="form-select">
+                  <option value="beginner">Beginner (Starting from scratch)</option>
+                  <option value="intermediate">Intermediate (Know basics, building projects)</option>
+                  <option value="advanced">Advanced (Refining architecture & optimization)</option>
+                </select>
+              </div>
+
+              <button type="submit" class="btn-action-primary" style="margin-top: 10px;">
+                <span>💾</span> Save Preferences
+              </button>
+            </form>
+
+            <div class="profile-actions">
+              <div>
+                <span style="font-weight: 600; font-size: 0.85rem; color: var(--text-main); display: block;">Reset Learning Data</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Clear all quiz scores, stats, and saved preferences</span>
+              </div>
+              <button type="button" class="btn-danger-outline" id="btnResetAllProgress">Reset All Data</button>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- CONFIRMATION MODAL -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+      <h3 class="modal-title" id="modalTitle">Clear Conversation</h3>
+      <p class="modal-desc" id="modalDesc">Are you sure you want to clear your entire chat history? This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="modalCancelBtn">Cancel</button>
+        <button class="btn-danger" id="modalConfirmBtn">Clear Chat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-notice" id="toastNotice" role="alert">
+    <span id="toastIcon">✅</span>
+    <span id="toastMessage">Changes saved successfully!</span>
+  </div>
+
+  <!-- JAVASCRIPT APPLICATION CODE -->
+  <script>
+    /* =========================================================
+       1. DATA STRUCTURES & PREDEFINED KNOWLEDGE BASE
+       ========================================================= */
+
+    // Predefined Quiz Question Bank (HTML, CSS, JavaScript)
+    const QUIZ_DATABASE = [
+      {
+        id: "html_1",
+        category: "html",
+        categoryLabel: "HTML",
+        question: "What does HTML stand for?",
+        options: [
+          "Hyper Text Markup Language",
+          "High Transfer Machine Language",
+          "Hyper Tool Multi Language",
+          "Home Text Management Language"
+        ],
+        correctIndex: 0,
+        explanation: "HTML stands for Hyper Text Markup Language. It is the standard markup language used to build the structure of web pages."
+      },
+      {
+        id: "html_2",
+        category: "html",
+        categoryLabel: "HTML",
+        question: "Which HTML element is used to define semantic navigation links?",
+        options: [
+          "<navigation>",
+          "<nav>",
+          "<links>",
+          "<menu-bar>"
+        ],
+        correctIndex: 1,
+        explanation: "The <nav> tag is semantic HTML intended for major blocks of navigation links, improving accessibility and SEO."
+      },
+      {
+        id: "html_3",
+        category: "html",
+        categoryLabel: "HTML",
+        question: "Which attribute is used to provide alternate text for images if they fail to load?",
+        options: [
+          "title",
+          "caption",
+          "alt",
+          "src"
+        ],
+        correctIndex: 2,
+        explanation: "The 'alt' attribute provides alternative text for screen readers and displays when the image cannot be rendered."
+      },
+      {
+        id: "html_4",
+        category: "html",
+        categoryLabel: "HTML",
+        question: "Which HTML tag is used to create an interactive multi-option dropdown list?",
+        options: [
+          "<dropdown>",
+          "<list>",
+          "<select>",
+          "<picker>"
+        ],
+        correctIndex: 2,
+        explanation: "The <select> element contains multiple <option> elements to build a dropdown selector in forms."
+      },
+      {
+        id: "css_1",
+        category: "css",
+        categoryLabel: "CSS",
+        question: "In the CSS Box Model, what is the space directly between the element's content and its border called?",
+        options: [
+          "Margin",
+          "Padding",
+          "Outline",
+          "Gap"
+        ],
+        correctIndex: 1,
+        explanation: "Padding is the inner clearance between the content and the border. Margin is the outer clearance outside the border."
+      },
+      {
+        id: "css_2",
+        category: "css",
+        categoryLabel: "CSS",
+        question: "Which CSS display property turns a container into a one-dimensional flexible layout along rows or columns?",
+        options: [
+          "display: grid",
+          "display: inline-block",
+          "display: flex",
+          "display: flow-root"
+        ],
+        correctIndex: 2,
+        explanation: "Flexbox (display: flex) organizes items in a 1D direction (either row or column) with flexible sizing and alignment."
+      },
+      {
+        id: "css_3",
+        category: "css",
+        categoryLabel: "CSS",
+        question: "How do you apply styles only to screens narrower than 768 pixels for responsive design?",
+        options: [
+          "@media (max-width: 768px)",
+          "@responsive (width <= 768px)",
+          "@screen (min-width: 768px)",
+          "@device (max: 768px)"
+        ],
+        correctIndex: 0,
+        explanation: "A CSS media query with '@media (max-width: 768px)' applies styles only when the viewport width is 768px or less."
+      },
+      {
+        id: "css_4",
+        category: "css",
+        categoryLabel: "CSS",
+        question: "Which CSS property specifies how flex items are aligned along the main axis?",
+        options: [
+          "align-items",
+          "justify-content",
+          "align-content",
+          "text-align"
+        ],
+        correctIndex: 1,
+        explanation: "'justify-content' aligns items along the main axis (horizontal by default), while 'align-items' controls the cross axis."
+      },
+      {
+        id: "js_1",
+        category: "javascript",
+        categoryLabel: "JavaScript",
+        question: "Which JavaScript keyword declares a block-scoped variable that CAN be reassigned?",
+        options: [
+          "const",
+          "var",
+          "let",
+          "fixed"
+        ],
+        correctIndex: 2,
+        explanation: "'let' is block-scoped and reassignable. 'const' cannot be reassigned, and 'var' is function-scoped (legacy)."
+      },
+      {
+        id: "js_2",
+        category: "javascript",
+        categoryLabel: "JavaScript",
+        question: "What method is used to attach a user event (like a click) to an HTML element in vanilla JavaScript?",
+        options: [
+          "element.attachEvent()",
+          "element.addEventListener()",
+          "element.onUserEvent()",
+          "element.bindEvent()"
+        ],
+        correctIndex: 1,
+        explanation: "'addEventListener()' is the modern standard way to register an event handler on a DOM node."
+      },
+      {
+        id: "js_3",
+        category: "javascript",
+        categoryLabel: "JavaScript",
+        question: "What does the DOM stand for in web development?",
+        options: [
+          "Document Object Model",
+          "Data Operations Management",
+          "Direct Output Mechanism",
+          "Distributed Object Module"
+        ],
+        correctIndex: 0,
+        explanation: "DOM stands for Document Object Model. It represents the HTML document as a structured tree of objects that JavaScript can manipulate."
+      },
+      {
+        id: "js_4",
+        category: "javascript",
+        categoryLabel: "JavaScript",
+        question: "How do you stop a form from reloading the browser page when submitted?",
+        options: [
+          "event.stopReload()",
+          "event.preventDefault()",
+          "event.halt()",
+          "event.cancelSubmission()"
+        ],
+        correctIndex: 1,
+        explanation: "'event.preventDefault()' cancels the default browser behavior, allowing client-side validation and AJAX handling."
+      }
+    ];
+
+    // Comprehensive Predefined Knowledge Base (Hackathons, GitHub, HTML, CSS, JavaScript, Projects, Learning Paths)
+    const KNOWLEDGE_BASE = [
+      // TOPIC A: HACKATHONS
+      {
+        id: "hackathon_overview",
+        topic: "hackathons",
+        keywords: ["what is a hackathon", "what is hackathon", "define hackathon", "hackathon meaning", "hackathons"],
+        title: "Understanding Hackathons",
+        answer: `<p>A <strong>hackathon</strong> is an intense, collaborative, time-bounded sprint (typically lasting <strong>24 to 48 hours</strong>) where students, developers, designers, and innovators unite to solve real-world problems by building software or hardware prototypes from scratch.</p>
+        <p><strong>Core Elements of a Hackathon:</strong></p>
+        <ul>
+          <li><strong>Teamwork:</strong> Teams of 2 to 4 members with complementary skills (frontend, backend, design, pitch).</li>
+          <li><strong>Theme & Tracks:</strong> Focused tracks like Healthcare, FinTech, EdTech, Climate, or Open Innovation.</li>
+          <li><strong>Mentorship:</strong> Industry experts guide teams to refine technical architecture and product viability.</li>
+          <li><strong>Final Pitch:</strong> A 3 to 5-minute live demo and presentation in front of judges.</li>
+        </ul>
+        <p>Hackathons are not just about winning prizes—they are the fastest way to learn new technologies, build portfolio-ready projects, and network with recruiters.</p>`,
+        suggestions: [
+          "How do I participate in a hackathon?",
+          "How do I prepare for a hackathon?",
+          "What should I build in a hackathon?"
+        ]
+      },
+      {
+        id: "hackathon_participate",
+        topic: "hackathons",
+        keywords: ["how to participate in a hackathon", "participate hackathon", "join a hackathon", "find hackathons", "register hackathon"],
+        title: "How to Participate in a Hackathon",
+        answer: `<p>Participating in your first hackathon is straightforward when you follow these actionable steps:</p>
+        <ol>
+          <li><strong>Find an Event:</strong> Explore reputable hackathon platforms such as <strong>Devpost</strong>, <strong>Unstop</strong>, <strong>Major League Hacking (MLH)</strong>, and college technical clubs.</li>
+          <li><strong>Form a Balanced Team:</strong> Aim for 3–4 members with diverse strengths: one UI/UX designer, one frontend developer, one backend/database developer, and one presenter.</li>
+          <li><strong>Read Problem Statements Early:</strong> Examine guidelines, APIs, judging criteria, and submission rules before hacking begins.</li>
+          <li><strong>Set Up Your Toolkit:</strong> Agree on a Git workflow (GitHub), communication channel (Discord/Slack), and UI prototyping tool (Figma).</li>
+        </ol>`,
+        suggestions: [
+          "How do I prepare for a hackathon?",
+          "What skills do I need for a hackathon?",
+          "Suggest hackathon project ideas"
+        ]
+      },
+      {
+        id: "hackathon_prepare",
+        topic: "hackathons",
+        keywords: ["how to prepare for a hackathon", "prepare hackathon", "hackathon preparation", "hackathon checklist"],
+        title: "Preparing for a Hackathon",
+        answer: `<p>Effective preparation ensures you spend hackathon hours building features rather than wrestling with configurations:</p>
+        <ul>
+          <li><strong>Template Repository:</strong> Create a starter boilerplate repo on GitHub with basic routing, CSS utilities, and local server setup.</li>
+          <li><strong>Version Control Mastery:</strong> Ensure all teammates know how to clone, branch, commit, push, and resolve merge conflicts.</li>
+          <li><strong>Time Management (48-hour strategy):</strong>
+            <ul>
+              <li><em>Hours 0–4:</em> Brainstorming, user story mapping, and architecture design.</li>
+              <li><em>Hours 4–28:</em> MVP (Minimum Viable Product) core feature development.</li>
+              <li><em>Hours 28–40:</em> UI polish, edge case testing, and integration.</li>
+              <li><em>Hours 40–48:</em> Pitch deck creation, demo video recording, and rehearsal.</li>
+            </ul>
+          </li>
+          <li><strong>Rest & Hydration:</strong> Take short breaks. A tired team makes bugs; a fresh team delivers a winning demo!</li>
+        </ul>`,
+        suggestions: [
+          "How do I make a good hackathon presentation?",
+          "What skills do I need for a hackathon?",
+          "Suggest hackathon project ideas"
+        ]
+      },
+      {
+        id: "hackathon_build",
+        topic: "hackathons",
+        keywords: ["what should i build in a hackathon", "what to build in hackathon", "hackathon project ideas", "winning hackathon project"],
+        title: "What to Build in a Hackathon",
+        answer: `<p>Judges evaluate hackathon projects on <strong>Impact, Innovation, Feasibility, and Execution</strong>. Focus on an MVP (Minimum Viable Product):</p>
+        <ul>
+          <li><strong>Solve a Real Pain Point:</strong> Target a genuine inconvenience faced by students, local communities, or small businesses.</li>
+          <li><strong>Working MVP over Feature Bloat:</strong> A clean, responsive app with 2 polished, fully working core features beats a complex app with 10 broken buttons.</li>
+          <li><strong>Clear User Journey:</strong> Ensure a guest judge can test your demo in under 60 seconds with realistic sample data preloaded.</li>
+        </ul>`,
+        suggestions: [
+          "How do I make a good hackathon presentation?",
+          "Suggest college projects",
+          "What skills do I need for a hackathon?"
+        ]
+      },
+      {
+        id: "hackathon_presentation",
+        topic: "hackathons",
+        keywords: ["how do i make a good hackathon presentation", "hackathon pitch", "hackathon presentation", "pitching tips", "presentation"],
+        title: "Winning Hackathon Pitch & Presentation",
+        answer: `<p>Your presentation decides your ranking! Structure your 3–5 minute pitch following the proven 5-part framework:</p>
+        <ol>
+          <li><strong>The Hook & Problem (30s):</strong> Share a compelling story or statistic illustrating the exact problem.</li>
+          <li><strong>The Solution (30s):</strong> Introduce your project title and the unique value proposition.</li>
+          <li><strong>Live Demo (90s):</strong> Show the live working app. Walk through the primary user path smoothly without technical jargon.</li>
+          <li><strong>Tech Stack & Innovation (30s):</strong> Highlight smart architectural choices, algorithms, accessibility, or security.</li>
+          <li><strong>Future Scope & Business Potential (30s):</strong> How the project can scale, monetize, or deploy into production.</li>
+        </ol>
+        <p><strong>Pro-Tip:</strong> Always have an offline screen recording or backup video ready in case Wi-Fi drops during the presentation!</p>`,
+        suggestions: [
+          "What should I build in a hackathon?",
+          "How do I prepare for a project presentation?",
+          "Suggest college projects"
+        ]
+      },
+      {
+        id: "hackathon_skills",
+        topic: "hackathons",
+        keywords: ["what skills do i need for a hackathon", "hackathon skills", "skills for hackathon", "can beginners join hackathon"],
+        title: "Skills Needed for Hackathons",
+        answer: `<p>You do <strong>not</strong> need to be an expert to participate! Hackathons welcome all skill tiers:</p>
+        <ul>
+          <li><strong>Frontend:</strong> HTML, CSS, JavaScript, and responsive UI layout.</li>
+          <li><strong>Collaboration:</strong> Git, GitHub, branching, and pull requests.</li>
+          <li><strong>Design:</strong> Wireframing with Figma or Pen & Paper, color harmony, typography.</li>
+          <li><strong>Soft Skills:</strong> Storytelling, time management, fast debugging, and resilience.</li>
+        </ul>
+        <p><em>Beginner Note:</em> Hackathons are learning environments. Even if you only write HTML and CSS, you will contribute massively to the prototype's presentation.</p>`,
+        suggestions: [
+          "What is GitHub?",
+          "What is a hackathon?",
+          "How do I use GitHub?"
+        ]
+      },
+
+      // TOPIC B: GITHUB & GIT
+      {
+        id: "github_overview",
+        topic: "github",
+        keywords: ["what is github", "what is git", "difference between git and github", "git vs github", "how do i use github"],
+        title: "Understanding Git and GitHub",
+        answer: `<p><strong>Git</strong> is a local, distributed <em>Version Control System (VCS)</em> that tracks file changes and code history over time. It was created by Linus Torvalds in 2005.</p>
+        <p><strong>GitHub</strong> is a cloud platform built around Git that hosts your repositories online, facilitates team collaboration, code reviews (Pull Requests), issue tracking, and automated deployment (GitHub Actions / Pages).</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>Analogy</span></div>
+          <div class="code-block">Git = The camera taking snapshots of your code.
+GitHub = The online photo album where you store and share those snapshots with your team.</div>
+        </div>`,
+        suggestions: [
+          "What is a repository?",
+          "How do I upload a project to GitHub?",
+          "How do I host a website using GitHub Pages?"
+        ]
+      },
+      {
+        id: "git_repo",
+        topic: "github",
+        keywords: ["what is a repository", "what is a repo", "git repository", "create repo"],
+        title: "What is a Repository?",
+        answer: `<p>A <strong>Repository</strong> (commonly called a <em>repo</em>) is the central directory where all your project files, assets, documentation, and the complete history of every commit are preserved.</p>
+        <ul>
+          <li><strong>Local Repository:</strong> The project folder located on your own computer containing the hidden <code>.git</code> folder.</li>
+          <li><strong>Remote Repository:</strong> The copy hosted on GitHub's servers, accessible by your teammates from anywhere.</li>
+          <li><strong>README.md:</strong> The front page of your repository written in Markdown to explain what your project does, how to install it, and how to use it.</li>
+        </ul>`,
+        suggestions: [
+          "How do I upload a project to GitHub?",
+          "What is a commit?",
+          "What is a branch?"
+        ]
+      },
+      {
+        id: "github_account",
+        topic: "github",
+        keywords: ["how do i create a github account", "create github account", "github sign up"],
+        title: "Creating a GitHub Account",
+        answer: `<p>Follow these quick steps to get started with GitHub:</p>
+        <ol>
+          <li>Visit <code class="inline-code">https://github.com</code> and click <strong>Sign Up</strong>.</li>
+          <li>Enter your university or personal email address, choose a secure password, and select a professional username (e.g., <code>firstnamelastname</code>).</li>
+          <li>Verify your email address via the launch code sent to your inbox.</li>
+          <li>Download and install <strong>Git</strong> on your computer from <code class="inline-code">git-scm.com</code>.</li>
+          <li>Configure your identity locally in terminal:
+            <div class="code-block-wrapper">
+              <div class="code-block-header"><span>Bash / PowerShell</span></div>
+              <div class="code-block">git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"</div>
+            </div>
+          </li>
+        </ol>`,
+        suggestions: [
+          "How do I upload a project to GitHub?",
+          "What is a commit?",
+          "How do I host a website using GitHub Pages?"
+        ]
+      },
+      {
+        id: "github_upload",
+        topic: "github",
+        keywords: ["how do i upload a project to github", "upload project to github", "push project to github", "push to github", "git push"],
+        title: "How to Upload a Project to GitHub",
+        answer: `<p>Here is the standard 5-step terminal procedure to publish your local project to GitHub:</p>
+        <ol>
+          <li>Open your terminal or command prompt inside your project folder.</li>
+          <li>Initialize a local Git repository:
+            <div class="code-block-wrapper"><div class="code-block">git init</div></div>
+          </li>
+          <li>Stage all files for commit:
+            <div class="code-block-wrapper"><div class="code-block">git add .</div></div>
+          </li>
+          <li>Create your initial snapshot commit:
+            <div class="code-block-wrapper"><div class="code-block">git commit -m "Initial commit: Add project files"</div></div>
+          </li>
+          <li>Create an empty repository on GitHub, then link and push:
+            <div class="code-block-wrapper"><div class="code-block">git remote add origin https://github.com/USERNAME/REPO_NAME.git
+git branch -M main
+git push -u origin main</div></div>
+          </li>
+        </ol>`,
+        suggestions: [
+          "What is a commit?",
+          "What is a branch?",
+          "How do I host a website using GitHub Pages?"
+        ]
+      },
+      {
+        id: "git_commit_branch_pr",
+        topic: "github",
+        keywords: ["what is a commit", "what is a branch", "what is a pull request", "git commit", "git branch", "pull request", "pr"],
+        title: "Commits, Branches & Pull Requests",
+        answer: `<p>These three concepts form the bedrock of collaborative engineering:</p>
+        <ul>
+          <li><strong>Commit:</strong> A permanent checkpoint or snapshot of your files at a specific moment with a descriptive message (e.g., <code>git commit -m "Add responsive navigation menu"</code>).</li>
+          <li><strong>Branch:</strong> An isolated line of development (e.g., <code>feature/login-modal</code>) branched off <code>main</code>, allowing you to build experiments without breaking working production code.</li>
+          <li><strong>Pull Request (PR):</strong> A formal proposal on GitHub to merge code from your branch into the main branch. It allows teammates to inspect code diffs, run automated checks, and comment before merging.</li>
+        </ul>`,
+        suggestions: [
+          "How do I upload a project to GitHub?",
+          "How do I host a website using GitHub Pages?",
+          "Explain HTML"
+        ]
+      },
+      {
+        id: "github_pages",
+        topic: "github",
+        keywords: ["how do i host a website using github pages", "github pages", "host website on github", "free hosting github"],
+        title: "Hosting Websites Free with GitHub Pages",
+        answer: `<p><strong>GitHub Pages</strong> lets you host static websites (HTML, CSS, JavaScript) directly from your repository for free:</p>
+        <ol>
+          <li>Ensure your project repository contains an entry point named exactly <code class="inline-code">index.html</code> in its root folder.</li>
+          <li>Push your latest code to the <code class="inline-code">main</code> branch on GitHub.</li>
+          <li>On GitHub, go to your repository's <strong>Settings</strong> tab.</li>
+          <li>Click <strong>Pages</strong> in the left sidebar menu under the "Code and automation" section.</li>
+          <li>Under <strong>Build and deployment &gt; Branch</strong>, select <code>main</code> and folder <code>/ (root)</code>, then click <strong>Save</strong>.</li>
+          <li>Wait 1–2 minutes. Your live website URL will appear at: <br><code class="inline-code">https://&lt;username&gt;.github.io/&lt;repository-name&gt;/</code></li>
+        </ol>`,
+        suggestions: [
+          "What is a repository?",
+          "Explain HTML",
+          "Suggest web development projects"
+        ]
+      },
+
+      // TOPIC C: HTML
+      {
+        id: "html_overview",
+        topic: "html",
+        keywords: ["explain html", "what is html", "learn html", "html basics", "html introduction"],
+        title: "Understanding HTML",
+        answer: `<p><strong>HTML (HyperText Markup Language)</strong> provides the structural skeleton of all web pages. It defines elements such as paragraphs, headers, images, forms, buttons, and hyperlinks using standard opening and closing tags.</p>
+        <p><strong>Basic Anatomy of an HTML Document:</strong></p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>HTML5 Document</span></div>
+          <div class="code-block">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;My First Web Page&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Hello, World!&lt;/h1&gt;
+    &lt;p&gt;Welcome to web development with LearnSmart AI.&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</div>
+        </div>`,
+        suggestions: [
+          "What are HTML tags?",
+          "What are semantic HTML elements?",
+          "What is the difference between HTML and CSS?"
+        ]
+      },
+      {
+        id: "html_tags",
+        topic: "html",
+        keywords: ["what are html tags", "html tags", "html elements", "common html tags"],
+        title: "Common HTML Tags",
+        answer: `<p>HTML tags wrap content to tell browsers how to interpret and display information:</p>
+        <ul>
+          <li><strong>Headings:</strong> <code>&lt;h1&gt;</code> through <code>&lt;h6&gt;</code> for page hierarchy.</li>
+          <li><strong>Text & Layout:</strong> <code>&lt;p&gt;</code> (paragraph), <code>&lt;span&gt;</code> (inline text), <code>&lt;div&gt;</code> (block container).</li>
+          <li><strong>Links & Media:</strong> <code>&lt;a href="url"&gt;</code> (hyperlinks) and <code>&lt;img src="pic.jpg" alt="Description"&gt;</code> (images).</li>
+          <li><strong>Lists:</strong> <code>&lt;ul&gt;</code> (unordered bullet list), <code>&lt;ol&gt;</code> (ordered numbered list), and <code>&lt;li&gt;</code> (list item).</li>
+          <li><strong>Interactivity:</strong> <code>&lt;button&gt;</code>, <code>&lt;input&gt;</code>, <code>&lt;textarea&gt;</code>, and <code>&lt;select&gt;</code>.</li>
+        </ul>`,
+        suggestions: [
+          "What are semantic HTML elements?",
+          "What are forms in HTML?",
+          "Test my HTML knowledge"
+        ]
+      },
+      {
+        id: "html_vs_css",
+        topic: "html",
+        keywords: ["what is the difference between html and css", "html vs css", "difference between html and css"],
+        title: "Difference Between HTML and CSS",
+        answer: `<p>HTML and CSS work together as the twin foundation of web frontend:</p>
+        <ul>
+          <li><strong>HTML (Structure & Content):</strong> Defines <em>what</em> appears on the page—text, headings, buttons, images, and tables. Analogous to the bricks, beams, and rooms of a house.</li>
+          <li><strong>CSS (Style & Layout):</strong> Defines <em>how</em> it looks—colors, margins, fonts, gradients, grid arrangements, and animations. Analogous to interior paint, lighting, and furniture layout.</li>
+        </ul>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>Quick Comparison</span></div>
+          <div class="code-block">&lt;!-- HTML --&gt;
+&lt;button class="cta-btn"&gt;Enroll Now&lt;/button&gt;
+
+/* CSS */
+.cta-btn {
+  background-color: #4f46e5;
+  color: white;
+  border-radius: 8px;
+  padding: 10px 20px;
+}</div>
+        </div>`,
+        suggestions: [
+          "Explain CSS",
+          "What are semantic HTML elements?",
+          "What is JavaScript?"
+        ]
+      },
+      {
+        id: "html_semantic",
+        topic: "html",
+        keywords: ["what are semantic html elements", "semantic html", "semantic tags", "why use semantic html"],
+        title: "Semantic HTML Elements",
+        answer: `<p><strong>Semantic HTML</strong> uses tags that clearly describe their meaning to both the browser and the developer, rather than generic <code>&lt;div&gt;</code> and <code>&lt;span&gt;</code> tags:</p>
+        <ul>
+          <li><code>&lt;header&gt;</code>: Introductory content, branding, or top navigation.</li>
+          <li><code>&lt;nav&gt;</code>: Container for major navigation links.</li>
+          <li><code>&lt;main&gt;</code>: Central, unique content of the document.</li>
+          <li><code>&lt;article&gt;</code>: Self-contained composition (blog post, news story, comment).</li>
+          <li><code>&lt;section&gt;</code>: Thematic grouping of content with its own heading.</li>
+          <li><code>&lt;aside&gt;</code>: Content indirectly related to main content (sidebars, callout boxes).</li>
+          <li><code>&lt;footer&gt;</code>: Footer information (copyright, links, contact info).</li>
+        </ul>
+        <p><strong>Benefits:</strong> Drastically boosts Web Accessibility (screen readers), improves search engine optimization (SEO), and makes code clean and maintainable.</p>`,
+        suggestions: [
+          "What are forms in HTML?",
+          "Explain CSS",
+          "Test my HTML knowledge"
+        ]
+      },
+      {
+        id: "html_forms",
+        topic: "html",
+        keywords: ["what are forms in html", "forms in html", "html form", "form validation html", "html inputs"],
+        title: "HTML Forms and User Input",
+        answer: `<p>HTML forms capture user data (login, search, survey, contact) and submit it for processing:</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>HTML Form Example</span></div>
+          <div class="code-block">&lt;form id="signupForm"&gt;
+  &lt;label for="email"&gt;Student Email:&lt;/label&gt;
+  &lt;input type="email" id="email" name="email" required placeholder="alex@college.edu"&gt;
+
+  &lt;label for="role"&gt;Primary Interest:&lt;/label&gt;
+  &lt;select id="role"&gt;
+    &lt;option value="frontend"&gt;Frontend&lt;/option&gt;
+    &lt;option value="backend"&gt;Backend&lt;/option&gt;
+  &lt;/select&gt;
+
+  &lt;button type="submit"&gt;Submit Application&lt;/button&gt;
+&lt;/form&gt;</div>
+        </div>
+        <p>Key attributes: <code>type</code> (text, email, password, number), <code>required</code>, <code>placeholder</code>, and semantic <code>&lt;label for="..."&gt;</code> tags for accessibility.</p>`,
+        suggestions: [
+          "How do I validate a form using JavaScript?",
+          "What is the DOM?",
+          "Explain CSS"
+        ]
+      },
+      {
+        id: "html_first_page",
+        topic: "html",
+        keywords: ["how do i create my first html page", "create my first html page", "first html page", "how to create first html page", "my first html page"],
+        title: "Creating Your First HTML Page",
+        answer: `<p>Creating your first web page takes only 3 simple steps:</p>
+        <ol>
+          <li>Open any text editor (like VS Code, Notepad, or TextEdit) and create a new file named exactly <code class="inline-code">index.html</code>.</li>
+          <li>Paste the standard HTML5 boilerplate code:
+            <div class="code-block-wrapper">
+              <div class="code-block-header"><span>index.html</span></div>
+              <div class="code-block">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;My First Website&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Hello World! 👋&lt;/h1&gt;
+  &lt;p&gt;This is my very first web page built with LearnSmart AI.&lt;/p&gt;
+  &lt;a href="https://github.com" target="_blank"&gt;Visit GitHub&lt;/a&gt;
+&lt;/body&gt;
+&lt;/html&gt;</div>
+            </div>
+          </li>
+          <li>Save the file and double-click it in your file manager to open and view it live in Google Chrome, Edge, or Firefox!</li>
+        </ol>`,
+        suggestions: [
+          "What are HTML tags?",
+          "What is the purpose of links and images?",
+          "Explain CSS"
+        ]
+      },
+      {
+        id: "html_links_images",
+        topic: "html",
+        keywords: ["what is the purpose of links and images", "purpose of links and images", "links and images in html", "html links and images", "purpose of links", "purpose of images", "anchor tags", "image tags"],
+        title: "Links and Images in HTML",
+        answer: `<p><strong>Hyperlinks (<code>&lt;a&gt;</code>)</strong> and <strong>Images (<code>&lt;img&gt;</code>)</strong> are the connective tissue of the World Wide Web:</p>
+        <ul>
+          <li><strong>Links (Anchor tag <code>&lt;a&gt;</code>):</strong> Allow users to navigate between pages, jump to sections, or download files.
+            <div class="code-block-wrapper">
+              <div class="code-block-header"><span>HTML Link</span></div>
+              <div class="code-block">&lt;!-- Open in new tab securely --&gt;
+&lt;a href="https://github.com" target="_blank" rel="noopener noreferrer"&gt;Explore GitHub&lt;/a&gt;</div>
+            </div>
+          </li>
+          <li><strong>Images (<code>&lt;img&gt;</code>):</strong> Embed visual graphics. It is a self-closing tag requiring a source (<code>src</code>) and accessible description (<code>alt</code>).
+            <div class="code-block-wrapper">
+              <div class="code-block-header"><span>HTML Image</span></div>
+              <div class="code-block">&lt;img src="hero-banner.jpg" alt="Students collaborating at a hackathon" width="600"&gt;</div>
+            </div>
+          </li>
+        </ul>
+        <p><strong>Accessibility note:</strong> Always provide descriptive <code>alt</code> text for images so visually impaired learners using screen readers understand your visual content!</p>`,
+        suggestions: [
+          "What are semantic HTML elements?",
+          "Explain CSS",
+          "Test my HTML knowledge"
+        ]
+      },
+
+      // TOPIC D: CSS
+      {
+        id: "css_overview",
+        topic: "css",
+        keywords: ["explain css", "what is css", "learn css", "css basics", "css introduction"],
+        title: "Understanding CSS",
+        answer: `<p><strong>CSS (Cascading Style Sheets)</strong> describes how HTML elements are presented visually on screens, printers, or other media. It controls typography, colors, layout structures, spacing, and animations.</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>CSS Rule Structure</span></div>
+          <div class="code-block">/* Selector { Property: Value; } */
+.card-container {
+  background-color: #ffffff;
+  color: #1e293b;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+}</div>
+        </div>`,
+        suggestions: [
+          "What is the box model?",
+          "What is Flexbox?",
+          "How do I make a website responsive?"
+        ]
+      },
+      {
+        id: "css_box_model",
+        topic: "css",
+        keywords: ["what is the box model", "box model", "box model css", "margin vs padding", "difference between margin and padding"],
+        title: "The CSS Box Model",
+        answer: `<p>Every element in CSS is treated as a rectangular box consisting of four concentric layers:</p>
+        <ol>
+          <li><strong>Content:</strong> The text, image, or media itself.</li>
+          <li><strong>Padding:</strong> Transparent inner space surrounding the content inside the border.</li>
+          <li><strong>Border:</strong> The line wrapping around the padding and content.</li>
+          <li><strong>Margin:</strong> Transparent outer space outside the border separating the element from neighboring elements.</li>
+        </ol>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>Best Practice Reset</span></div>
+          <div class="code-block">* {
+  box-sizing: border-box; /* Includes padding & border in width */
+  margin: 0;
+  padding: 0;
+}</div>
+        </div>`,
+        suggestions: [
+          "What is Flexbox?",
+          "What is CSS Grid?",
+          "Test my CSS knowledge"
+        ]
+      },
+      {
+        id: "css_flexbox",
+        topic: "css",
+        keywords: ["what is flexbox", "flexbox", "css flexbox", "flexbox css", "display flex"],
+        title: "Flexbox Layout (1D)",
+        answer: `<p><strong>Flexbox (Flexible Box Layout)</strong> is designed for <em>one-dimensional</em> layout arrangements along a row or column:</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>Flexbox Example</span></div>
+          <div class="code-block">.nav-container {
+  display: flex;
+  flex-direction: row;        /* main axis: row or column */
+  justify-content: space-between; /* distribution along main axis */
+  align-items: center;        /* alignment along cross axis */
+  gap: 16px;                  /* spacing between children */
+}</div>
+        </div>
+        <p><strong>When to use:</strong> Navigation bars, button groups, centering cards horizontally and vertically, and media object rows.</p>`,
+        suggestions: [
+          "What is CSS Grid?",
+          "How do I make a website responsive?",
+          "Test my CSS knowledge"
+        ]
+      },
+      {
+        id: "css_grid",
+        topic: "css",
+        keywords: ["what is css grid", "css grid", "grid vs flexbox", "difference between flexbox and grid"],
+        title: "CSS Grid Layout (2D)",
+        answer: `<p><strong>CSS Grid</strong> is a powerful <em>two-dimensional</em> layout system managing both columns and rows simultaneously:</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>Responsive CSS Grid</span></div>
+          <div class="code-block">.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}</div>
+        </div>
+        <p><strong>Rule of thumb:</strong> Use Flexbox for 1D content flows (navbars, card internals); use CSS Grid for overall 2D page architecture and card galleries.</p>`,
+        suggestions: [
+          "What is Flexbox?",
+          "How do I make a website responsive?",
+          "What is the box model?"
+        ]
+      },
+      {
+        id: "css_responsive",
+        topic: "css",
+        keywords: ["how do i make a website responsive", "responsive design", "media queries", "responsive css"],
+        title: "Responsive Web Design Principles",
+        answer: `<p>A responsive website adapts seamlessly across smartphones, tablets, and large monitors:</p>
+        <ul>
+          <li><strong>Viewport Meta Tag:</strong> Ensure this tag exists in your HTML <code>&lt;head&gt;</code>:
+            <div class="code-block-wrapper"><div class="code-block">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</div></div>
+          </li>
+          <li><strong>Fluid Units:</strong> Favor percentages (<code>%</code>), viewport units (<code>vw</code>, <code>vh</code>), and relative text units (<code>rem</code>) over rigid pixel sizes.</li>
+          <li><strong>Media Queries:</strong>
+            <div class="code-block-wrapper">
+              <div class="code-block-header"><span>CSS Media Query</span></div>
+              <div class="code-block">/* Mobile First Style */
+.sidebar { display: none; }
+
+/* Desktop Screens */
+@media (min-width: 768px) {
+  .sidebar { display: block; width: 280px; }
+}</div>
+            </div>
+          </li>
+        </ul>`,
+        suggestions: [
+          "What is Flexbox?",
+          "What is CSS Grid?",
+          "Test my CSS knowledge"
+        ]
+      },
+      {
+        id: "css_selectors",
+        topic: "css",
+        keywords: ["what are css selectors", "css selectors", "selectors in css", "types of css selectors", "selector types"],
+        title: "CSS Selectors",
+        answer: `<p><strong>CSS Selectors</strong> target specific HTML elements on the page so you can apply styles to them:</p>
+        <ul>
+          <li><strong>Element Selector:</strong> Targets by HTML tag name (e.g. <code>p { line-height: 1.6; }</code>).</li>
+          <li><strong>Class Selector (<code>.</code>):</strong> Reusable identifier targeting any element with that class (e.g. <code>.btn-primary { background: #4f46e5; }</code>).</li>
+          <li><strong>ID Selector (<code>#</code>):</strong> Unique identifier targeting exactly one element (e.g. <code>#navHeader { position: sticky; }</code>).</li>
+          <li><strong>Attribute Selector (<code>[...]</code>):</strong> Targets by HTML attributes (e.g. <code>input[type="email"] { border-color: #3b82f6; }</code>).</li>
+          <li><strong>Pseudo-Classes (<code>:</code>):</strong> Styles elements based on user interaction or state (e.g. <code>button:hover</code>, <code>input:focus</code>, <code>li:nth-child(even)</code>).</li>
+        </ul>`,
+        suggestions: [
+          "What is the box model?",
+          "How do I add colors, gradients, shadows, and animations?",
+          "What is Flexbox?"
+        ]
+      },
+      {
+        id: "css_margin_padding",
+        topic: "css",
+        keywords: ["what is the difference between margin and padding", "difference between margin and padding", "margin vs padding", "margin and padding difference"],
+        title: "Difference Between Margin and Padding",
+        answer: `<p>While both create blank space around elements, they serve fundamentally different layout roles:</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>Box Model Visual Layout</span></div>
+          <div class="code-block">┌──────────────── Margin (Outer Spacing) ────────────────┐
+│  ┌────────────── Border (Visible Boundary) ──────────┐  │
+│  │  ┌─────────── Padding (Inner Spacing) ──────────┐  │  │
+│  │  │                                              │  │  │
+│  │  │               CONTENT AREA                   │  │  │
+│  │  │                                              │  │  │
+│  │  └──────────────────────────────────────────────┘  │  │
+│  └───────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────┘</div>
+        </div>
+        <ul>
+          <li><strong>Padding (Inside):</strong> The breathing room inside the border. If you give a button a background color, padding makes the colored button larger.</li>
+          <li><strong>Margin (Outside):</strong> The personal space outside the border. It pushes adjacent neighbor elements away from each other. Background colors do not apply to margins.</li>
+        </ul>`,
+        suggestions: [
+          "What is the box model?",
+          "What is Flexbox?",
+          "Test my CSS knowledge"
+        ]
+      },
+      {
+        id: "css_colors_gradients",
+        topic: "css",
+        keywords: ["how do i add colors gradients shadows and animations", "add colors gradients shadows and animations", "css colors", "css gradients", "css shadows", "css animations", "colors gradients shadows animations"],
+        title: "Colors, Gradients, Shadows & Animations in CSS",
+        answer: `<p>Modern CSS offers visual styling tools directly in browser without image files:</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>Visual CSS Showcase</span></div>
+          <div class="code-block">.modern-card {
+  /* 1. Gradient Background */
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: #ffffff;
+  
+  /* 2. Soft Shadow */
+  box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);
+  border-radius: 14px;
+  
+  /* 3. Smooth Hover Animation */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modern-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 30px -5px rgba(79, 70, 229, 0.45);
+}
+
+/* 4. Keyframe Animation */
+@keyframes pulseGlow {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}</div>
+        </div>`,
+        suggestions: [
+          "What is the box model?",
+          "How do I make a website responsive?",
+          "What is JavaScript?"
+        ]
+      },
+
+      // TOPIC E: JAVASCRIPT
+      {
+        id: "js_overview",
+        topic: "javascript",
+        keywords: ["what is javascript", "explain javascript", "learn javascript", "js basics", "javascript introduction"],
+        title: "Understanding JavaScript",
+        answer: `<p><strong>JavaScript (JS)</strong> is the programming language that powers interactive behavior, data manipulation, asynchronous network requests, and dynamic DOM updates on the web.</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>Vanilla JavaScript</span></div>
+          <div class="code-block">const studentName = "Alex";
+let score = 95;
+
+function displayBadge(name, points) {
+  return points &gt;= 90 ? \`\${name}: Honor Roll 🏆\` : \`\${name}: Keep Going!\`;
+}
+
+console.log(displayBadge(studentName, score));</div>
+        </div>`,
+        suggestions: [
+          "What are variables?",
+          "What is the DOM?",
+          "What are functions?"
+        ]
+      },
+      {
+        id: "js_variables_types",
+        topic: "javascript",
+        keywords: ["what are variables", "what are data types", "let const var", "javascript data types", "javascript variables"],
+        title: "JavaScript Variables and Data Types",
+        answer: `<p><strong>Declaring Variables:</strong></p>
+        <ul>
+          <li><code>const</code>: Block-scoped, immutable identifier binding. Use by default for objects, arrays, and fixed constants.</li>
+          <li><code>let</code>: Block-scoped, reassignable. Ideal for loop counters and updated values.</li>
+          <li><code>var</code>: Function-scoped (legacy, avoid in modern development).</li>
+        </ul>
+        <p><strong>Primary Data Types:</strong></p>
+        <ul>
+          <li><em>Primitives:</em> String (<code>"hello"</code>), Number (<code>42</code>, <code>3.14</code>), Boolean (<code>true/false</code>), Undefined, Null, BigInt, Symbol.</li>
+          <li><em>Objects (Reference):</em> Arrays (<code>[1, 2, 3]</code>), Plain Objects (<code>{ title: "JS", level: 1 }</code>), and Functions.</li>
+        </ul>`,
+        suggestions: [
+          "What are functions?",
+          "What are loops?",
+          "What is the DOM?"
+        ]
+      },
+      {
+        id: "js_functions",
+        topic: "javascript",
+        keywords: ["what are functions", "javascript functions", "arrow functions", "functions in javascript"],
+        title: "Functions in JavaScript",
+        answer: `<p>Functions encapsulate reusable logic and can accept parameters and return values:</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>Function Declaration vs Arrow Syntax</span></div>
+          <div class="code-block">// 1. Traditional Function Declaration
+function calculateGrade(score) {
+  return score &gt;= 50 ? "Pass" : "Revise";
+}
+
+// 2. Modern Arrow Function
+const calculateGradeArrow = (score) =&gt; score &gt;= 50 ? "Pass" : "Revise";
+
+// Usage
+console.log(calculateGradeArrow(82)); // "Pass"</div>
+        </div>`,
+        suggestions: [
+          "What is the DOM?",
+          "What are events?",
+          "Test my JavaScript knowledge"
+        ]
+      },
+      {
+        id: "js_dom",
+        topic: "javascript",
+        keywords: ["what is the dom", "the dom", "dom manipulation", "document object model", "queryselector"],
+        title: "The Document Object Model (DOM)",
+        answer: `<p>The <strong>DOM</strong> is a tree-like object representation of the HTML document created by the browser. JavaScript uses the DOM API to read and update page content, classes, and styles dynamically:</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>DOM Manipulation Example</span></div>
+          <div class="code-block">// Select element
+const titleEl = document.querySelector("#pageTitle");
+
+// Modify text content safely
+titleEl.textContent = "Welcome to LearnSmart AI!";
+
+// Add or remove CSS classes
+titleEl.classList.add("highlight");</div>
+        </div>`,
+        suggestions: [
+          "What are events?",
+          "How do I validate a form using JavaScript?",
+          "Test my JavaScript knowledge"
+        ]
+      },
+      {
+        id: "js_events",
+        topic: "javascript",
+        keywords: ["what are events", "javascript events", "event listener", "addeventlistener"],
+        title: "Handling User Events in JavaScript",
+        answer: `<p>Events represent actions occurring in the browser triggered by users (clicks, keypresses, scrolls) or system changes:</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>Event Listener Example</span></div>
+          <div class="code-block">const enrollBtn = document.querySelector("#enrollBtn");
+
+enrollBtn.addEventListener("click", function(event) {
+  event.target.textContent = "Enrolled Successfully! 🎉";
+  event.target.disabled = true;
+});</div>
+        </div>
+        <p>Common events: <code>click</code>, <code>input</code>, <code>submit</code>, <code>keydown</code>, <code>change</code>.</p>`,
+        suggestions: [
+          "How do I validate a form using JavaScript?",
+          "What is the DOM?",
+          "Test my JavaScript knowledge"
+        ]
+      },
+      {
+        id: "js_form_validation",
+        topic: "javascript",
+        keywords: ["how do i validate a form using javascript", "form validation", "javascript form validation", "validate form"],
+        title: "Client-Side Form Validation in JavaScript",
+        answer: `<p>Client-side form validation prevents incorrect or empty submissions before processing:</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>Form Validation Example</span></div>
+          <div class="code-block">const form = document.querySelector("#loginForm");
+const emailInput = document.querySelector("#userEmail");
+const errorMsg = document.querySelector("#errorText");
+
+form.addEventListener("submit", function(e) {
+  // 1. Prevent default page reload
+  e.preventDefault();
+
+  const emailValue = emailInput.value.trim();
+
+  // 2. Validate condition
+  if (!emailValue.includes("@") || emailValue.length &lt; 5) {
+    errorMsg.textContent = "Please enter a valid student email address!";
+    errorMsg.style.color = "red";
+    emailInput.focus();
+    return;
+  }
+
+  // 3. Success state
+  errorMsg.textContent = "";
+  alert("Validation passed! Submitting form...");
+});</div>
+        </div>`,
+        suggestions: [
+          "What is the DOM?",
+          "What are events?",
+          "Suggest web development projects"
+        ]
+      },
+      {
+        id: "js_arrays_objects",
+        topic: "javascript",
+        keywords: ["what are arrays and objects", "arrays and objects", "javascript arrays and objects", "arrays and objects in javascript", "arrays", "objects", "javascript arrays", "javascript objects"],
+        title: "Arrays and Objects in JavaScript",
+        answer: `<p>Arrays and Objects are complex data structures used to store collections of information:</p>
+        <ul>
+          <li><strong>Arrays (<code>[...]</code>):</strong> Ordered list of values accessed by zero-based numerical index.
+            <div class="code-block-wrapper">
+              <div class="code-block-header"><span>JavaScript Array</span></div>
+              <div class="code-block">const topics = ["HTML", "CSS", "JavaScript", "GitHub"];
+console.log(topics[0]); // "HTML"
+topics.push("React");   // Add item</div>
+            </div>
+          </li>
+          <li><strong>Objects (<code>{...}</code>):</strong> Unordered collection of key-value pairs representing an entity with properties.
+            <div class="code-block-wrapper">
+              <div class="code-block-header"><span>JavaScript Object</span></div>
+              <div class="code-block">const student = {
+  name: "Alex",
+  year: 3,
+  interests: ["Web Dev", "Hackathons"],
+  greet: function() { return \`Hi, I am \${this.name}\`; }
+};
+console.log(student.name); // "Alex"</div>
+            </div>
+          </li>
+        </ul>`,
+        suggestions: [
+          "What are loops?",
+          "What are functions?",
+          "Test my JavaScript knowledge"
+        ]
+      },
+      {
+        id: "js_loops",
+        topic: "javascript",
+        keywords: ["what are loops", "loops in javascript", "for loop", "while loop", "javascript loops", "foreach loop", "how do loops work"],
+        title: "Loops in JavaScript",
+        answer: `<p><strong>Loops</strong> execute a block of code repeatedly as long as a specified condition evaluates to true:</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>Common Loop Variations</span></div>
+          <div class="code-block">// 1. Standard For Loop (When count is known)
+for (let i = 0; i &lt; 5; i++) {
+  console.log(\`Iteration: \${i}\`);
+}
+
+// 2. For...of Loop (Iterating over arrays)
+const skills = ["Git", "HTML", "CSS"];
+for (const skill of skills) {
+  console.log(skill);
+}
+
+// 3. Array.forEach() Method
+skills.forEach(skill =&gt; console.log(\`Mastering \${skill}\`));
+
+// 4. While Loop (When termination depends on condition)
+let attempts = 0;
+while (attempts &lt; 3) {
+  attempts++;
+}</div>
+        </div>`,
+        suggestions: [
+          "What are conditional statements?",
+          "What are arrays and objects?",
+          "Test my JavaScript knowledge"
+        ]
+      },
+      {
+        id: "js_conditionals",
+        topic: "javascript",
+        keywords: ["what are conditional statements", "conditional statements in javascript", "if else statements", "switch statements", "conditionals", "if else in javascript"],
+        title: "Conditional Statements in JavaScript",
+        answer: `<p><strong>Conditional Statements</strong> control the decision-making flow of your application based on boolean conditions:</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header"><span>Conditionals Example</span></div>
+          <div class="code-block">const quizScore = 85;
+
+// 1. If / Else If / Else
+if (quizScore &gt;= 80) {
+  console.log("Mastery Level: Advanced 🏆");
+} else if (quizScore &gt;= 50) {
+  console.log("Mastery Level: Intermediate 👍");
+} else {
+  console.log("Mastery Level: Beginner 📚");
+}
+
+// 2. Ternary Operator (Shorthand for simple decisions)
+const status = quizScore &gt;= 50 ? "Passed" : "Needs Review";
+
+// 3. Switch Statement (Multiple exact match cases)
+switch (status) {
+  case "Passed":
+    console.log("Proceed to next module");
+    break;
+  default:
+    console.log("Repeat practice quiz");
+}</div>
+        </div>`,
+        suggestions: [
+          "What are functions?",
+          "What are loops?",
+          "Test my JavaScript knowledge"
+        ]
+      },
+
+      // TOPIC F: COLLEGE PROJECTS
+      {
+        id: "college_projects_overview",
+        topic: "projects",
+        keywords: ["suggest college project ideas", "suggest college projects", "college project ideas", "project ideas", "projects", "college projects", "list of college projects"],
+        title: "Top 10 College Project Ideas",
+        answer: `<p>Here are 10 academically vetted college project ideas spanning Web Development, Data Dashboards, and Rule-Based AI:</p>
+        
+        <div class="bot-card">
+          <div class="bot-card-header">
+            <span class="bot-card-title">1. AI Personalized Learning Platform</span>
+            <span class="badge badge-medium">Intermediate</span>
+          </div>
+          <p><strong>Description:</strong> An adaptive web app that diagnoses student understanding through interactive quizzes and generates tailored revision paths without third-party API fees.</p>
+          <p><strong>Key Features:</strong> Rule-based diagnostic engine, instant quiz grading, progress analytics, customizable student tracks.</p>
+          <p><strong>Technologies:</strong> HTML5, CSS3, Vanilla JavaScript, Web Storage API (LocalStorage).</p>
+        </div>
+
+        <div class="bot-card">
+          <div class="bot-card-header">
+            <span class="bot-card-title">2. Student Attendance Management System</span>
+            <span class="badge badge-easy">Beginner</span>
+          </div>
+          <p><strong>Description:</strong> A streamlined attendance tracking portal for college professors and class representatives.</p>
+          <p><strong>Key Features:</strong> Student roster import/entry, daily attendance marking, automatic &lt;75% attendance warning alerts, CSV export.</p>
+          <p><strong>Technologies:</strong> HTML, CSS, JavaScript, LocalStorage, File API.</p>
+        </div>
+
+        <div class="bot-card">
+          <div class="bot-card-header">
+            <span class="bot-card-title">3. Online Quiz Application</span>
+            <span class="badge badge-easy">Beginner</span>
+          </div>
+          <p><strong>Description:</strong> A timed examination system with multi-category question banks and live scorecards.</p>
+          <p><strong>Key Features:</strong> Countdown timer, randomized question pool, immediate answer rationale, high-score leaderboard.</p>
+          <p><strong>Technologies:</strong> HTML5, CSS3 Flexbox/Grid, Vanilla JavaScript.</p>
+        </div>
+
+        <div class="bot-card">
+          <div class="bot-card-header">
+            <span class="bot-card-title">4. Student Task & Exam Planner</span>
+            <span class="badge badge-easy">Beginner</span>
+          </div>
+          <p><strong>Description:</strong> A productivity Kanban board and deadline tracker tailored for college coursework and exams.</p>
+          <p><strong>Key Features:</strong> Drag-and-drop task lanes (Todo, In Progress, Done), urgency priority tags, syllabus countdown.</p>
+          <p><strong>Technologies:</strong> HTML, CSS, JavaScript Drag and Drop API.</p>
+        </div>
+
+        <div class="bot-card">
+          <div class="bot-card-header">
+            <span class="bot-card-title">5. College Event Management Website</span>
+            <span class="badge badge-medium">Intermediate</span>
+          </div>
+          <p><strong>Description:</strong> A centralized portal for university technical fests, hackathons, and cultural club activities.</p>
+          <p><strong>Key Features:</strong> Event calendar, participant registration form with validation, QR ticket generator, announcement feed.</p>
+          <p><strong>Technologies:</strong> HTML5, Modern CSS, JavaScript, QRCode.js (optional).</p>
+        </div>
+
+        <div class="bot-card">
+          <div class="bot-card-header">
+            <span class="bot-card-title">6. Personal Developer Portfolio Website</span>
+            <span class="badge badge-easy">Beginner</span>
+          </div>
+          <p><strong>Description:</strong> A personal portfolio showcasing projects, resume, hackathon achievements, and contact information.</p>
+          <p><strong>Key Features:</strong> Responsive layout, dark/light theme toggle, interactive project preview modals, working contact form.</p>
+          <p><strong>Technologies:</strong> Semantic HTML5, CSS3 Media Queries, JavaScript, GitHub Pages hosting.</p>
+        </div>
+
+        <div class="bot-card">
+          <div class="bot-card-header">
+            <span class="bot-card-title">7. Expense Tracker & Student Budget Planner</span>
+            <span class="badge badge-easy">Beginner</span>
+          </div>
+          <p><strong>Description:</strong> Financial management web app tracking student allowances, monthly spending, and savings goals.</p>
+          <p><strong>Key Features:</strong> Category breakdown (Food, Books, Travel), budget limit alerts, HTML5 Canvas spending chart, transaction filter.</p>
+          <p><strong>Technologies:</strong> HTML5, CSS, JavaScript, Canvas API, LocalStorage.</p>
+        </div>
+
+        <div class="bot-card">
+          <div class="bot-card-header">
+            <span class="bot-card-title">8. Library Management System</span>
+            <span class="badge badge-medium">Intermediate</span>
+          </div>
+          <p><strong>Description:</strong> Digital book catalog and lending registry for campus departmental libraries.</p>
+          <p><strong>Key Features:</strong> Real-time search by title/author, book issue and return tracking, fine calculation for overdue days.</p>
+          <p><strong>Technologies:</strong> HTML, CSS, JavaScript, IndexedDB or LocalStorage.</p>
+        </div>
+
+        <div class="bot-card">
+          <div class="bot-card-header">
+            <span class="bot-card-title">9. Student Performance Dashboard</span>
+            <span class="badge badge-medium">Intermediate</span>
+          </div>
+          <p><strong>Description:</strong> Analytics dashboard visualizing semester grades, test metrics, and GPA trends.</p>
+          <p><strong>Key Features:</strong> Dynamic bar/line graphs, subject mastery gauges, risk indicator for low-scoring courses.</p>
+          <p><strong>Technologies:</strong> HTML5, CSS Grid, JavaScript Canvas / SVG visualization.</p>
+        </div>
+
+        <div class="bot-card">
+          <div class="bot-card-header">
+            <span class="bot-card-title">10. Career Guidance & Tech Pathway Quiz</span>
+            <span class="badge badge-easy">Beginner</span>
+          </div>
+          <p><strong>Description:</strong> An interactive questionnaire evaluating student interests and matching them to software engineering roles.</p>
+          <p><strong>Key Features:</strong> Branching assessment questions, role compatibility scoring (Frontend, DevOps, AI, Cybersecurity), curated roadmap recommendations.</p>
+          <p><strong>Technologies:</strong> HTML, CSS, Vanilla JavaScript decision trees.</p>
+        </div>`,
+        suggestions: [
+          "Suggest beginner-friendly projects",
+          "Suggest final-year project ideas",
+          "How do I choose a project?"
+        ]
+      },
+      {
+        id: "projects_beginner",
+        topic: "projects",
+        keywords: ["suggest beginner-friendly projects", "beginner projects", "beginner project ideas", "easy projects", "simple college projects"],
+        title: "Beginner-Friendly College Projects",
+        answer: `<p>These projects are ideal for 1st and 2nd-year students to master fundamental web development:</p>
+        <ol>
+          <li><strong>Personal Portfolio Website (Difficulty: Beginner):</strong> Build a showcase for your projects, resume, and GitHub links. Deploy free on GitHub Pages!</li>
+          <li><strong>Online Quiz Application (Difficulty: Beginner):</strong> 10-question quiz with score tracking, countdown timer, and immediate explanations.</li>
+          <li><strong>Expense Tracker (Difficulty: Beginner):</strong> Log daily expenditures, group by categories, and visualize spending using Canvas.</li>
+          <li><strong>Student Task Planner (Difficulty: Beginner):</strong> A lightweight to-do Kanban board with local persistence.</li>
+        </ol>`,
+        suggestions: [
+          "Suggest web development projects",
+          "How do I choose a project?",
+          "How do I upload a project to GitHub?"
+        ]
+      },
+      {
+        id: "projects_final_year",
+        topic: "projects",
+        keywords: ["suggest final-year project ideas", "final year project ideas", "capstone project ideas", "final year projects", "major project ideas"],
+        title: "Final-Year Capstone Project Ideas",
+        answer: `<p>Capstone projects require multi-module architectures, database modeling, and tangible institutional or business impact:</p>
+        <ul>
+          <li><strong>College Event & Hackathon Management Website:</strong>
+            <br>Multi-role portal (Admins, Club Heads, Students) managing registrations, schedule announcements, QR attendance check-ins, and automated certificate generation.
+            <br><em>Technologies:</em> Full-stack JavaScript (Node.js/Express or Python), SQL database, CSS Grid.
+          </li>
+          <li><strong>Student Performance & Dropout Risk Dashboard:</strong>
+            <br>Analyzes academic trajectories, attendance anomalies, and internal marks to flag students requiring academic intervention.
+            <br><em>Technologies:</em> Frontend Data Dashboards, Statistical calculation algorithms, CSV Export.
+          </li>
+          <li><strong>AI Personalized Learning Platform:</strong>
+            <br>Diagnostic rule-based learning assistant tailored for university courses with mastery roadmaps.
+          </li>
+        </ul>`,
+        suggestions: [
+          "What are the main modules of a college project?",
+          "How do I write a project report?",
+          "How do I prepare a project presentation?"
+        ]
+      },
+      {
+        id: "projects_web_dev",
+        topic: "projects",
+        keywords: ["suggest web development projects", "web development projects", "web dev project ideas", "web dev projects", "web development ideas"],
+        title: "Web Development Project Ideas",
+        answer: `<p>Web projects demonstrate your ability to create responsive, accessible, interactive web interfaces:</p>
+        <ul>
+          <li><strong>1. College Event Management Website:</strong> Interactive fest schedule, filterable by workshop/competition, with participant team forms.</li>
+          <li><strong>2. Online Quiz & Assessment Platform:</strong> Timed multiple-choice platform with instant score breakdown and revision suggestions.</li>
+          <li><strong>3. Developer Portfolio & Blog:</strong> Custom portfolio with a markdown article viewer, code copy buttons, and responsive theme switcher.</li>
+          <li><strong>4. Student Task Kanban Board:</strong> Visual project workflow manager with drag-and-drop status columns.</li>
+        </ul>`,
+        suggestions: [
+          "Suggest college project ideas",
+          "How do I host a website using GitHub Pages?",
+          "How do I choose a project?"
+        ]
+      },
+      {
+        id: "projects_ai_no_api",
+        topic: "projects",
+        keywords: ["suggest ai-related projects without api keys", "ai projects without api", "ai project without api keys", "ai project ideas", "offline ai projects"],
+        title: "AI-Related Projects Without API Keys",
+        answer: `<p>You can create sophisticated, intelligent web applications entirely client-side without paid third-party AI APIs:</p>
+        <ol>
+          <li><strong>Rule-Based Expert Learning System:</strong> Diagnoses student misconceptions through quiz error analysis and suggests remedial modules using deterministic logic trees (like this LearnSmart AI!).</li>
+          <li><strong>In-Browser Optical Character Recognition (OCR):</strong> Integrate <code class="inline-code">Tesseract.js</code> to extract printed text from photographed textbook pages entirely inside the browser.</li>
+          <li><strong>Client-Side Vision & Gesture Control:</strong> Use <code class="inline-code">TensorFlow.js</code> to recognize hand gestures via webcam for controlling slides or games.</li>
+          <li><strong>Career Guidance Decision Tree Engine:</strong> Matches student aptitude scores to tech specializations using probabilistic weights.</li>
+        </ol>`,
+        suggestions: [
+          "Suggest college project ideas",
+          "How do I choose a project?",
+          "What are the main modules of a college project?"
+        ]
+      },
+      {
+        id: "projects_choose",
+        topic: "projects",
+        keywords: ["how do i choose a project", "how to choose a project", "how do i select a project", "choose college project", "selecting a project"],
+        title: "How to Choose the Right College Project",
+        answer: `<p>Select a winning college project by evaluating these 4 criteria:</p>
+        <ol>
+          <li><strong>Genuine Problem Worth Solving:</strong> Choose a problem you or your campus peers experience daily (e.g. attendance tracking, fest registrations, study planning).</li>
+          <li><strong>Feasible Scope within Timeframe:</strong> Scope a solid Minimum Viable Product (MVP) you can complete in 3 to 6 weeks. It is far better to have 3 polished, fully working modules than 10 half-finished ones.</li>
+          <li><strong>Aligned Tech Stack:</strong> Pick technologies relevant to your career goals (HTML, CSS, JavaScript, Git) rather than esoteric tools.</li>
+          <li><strong>Demonstrable Live Demo:</strong> Ensure the project can run smoothly in front of examiners or hackathon judges in under 2 minutes.</li>
+        </ol>`,
+        suggestions: [
+          "Suggest college project ideas",
+          "What are the main modules of a college project?",
+          "How do I write a project report?"
+        ]
+      },
+      {
+        id: "project_presentation_prep",
+        topic: "projects",
+        keywords: ["how do i prepare a project presentation", "project presentation", "college project presentation", "project viva", "how to present project"],
+        title: "Preparing a College Project Presentation & Viva",
+        answer: `<p>Deliver an impressive academic project presentation using this structured 8-slide deck:</p>
+        <ol>
+          <li><strong>Title Slide:</strong> Project Title, Team Members, Guide / Faculty Advisor.</li>
+          <li><strong>Problem Statement:</strong> Why this project is necessary and what existing systems lack.</li>
+          <li><strong>Proposed Solution & Objectives:</strong> What your application does and key outcomes.</li>
+          <li><strong>Architecture & System Flow:</strong> Block diagram showing Frontend, Logic, and Data Storage layers.</li>
+          <li><strong>Live Demonstration (Crucial!):</strong> Show the live working app in browser. Demonstrate real input and output.</li>
+          <li><strong>Key Technical Innovations:</strong> Algorithms, validation rules, responsiveness, or security precautions.</li>
+          <li><strong>Challenges Overcome:</strong> Concrete bugs or design hurdles your team solved.</li>
+          <li><strong>Future Scope & Conclusion:</strong> What features can be added in version 2.0.</li>
+        </ol>`,
+        suggestions: [
+          "How do I write a project report?",
+          "What are the main modules of a college project?",
+          "Suggest college project ideas"
+        ]
+      },
+      {
+        id: "project_report_prep",
+        topic: "projects",
+        keywords: ["how do i write a project report", "project report", "project documentation", "college project report format", "how to write project report"],
+        title: "How to Write a College Project Report",
+        answer: `<p>Follow the standard academic/IEEE documentation template for your college project report:</p>
+        <ol>
+          <li><strong>Cover Page, Certificate & Declaration:</strong> University guidelines, guide signatures, and originality statement.</li>
+          <li><strong>Abstract:</strong> 250-word concise overview covering Problem, Methodology, Implementation, and Results.</li>
+          <li><strong>Chapter 1 — Introduction:</strong> Motivation, problem definition, objectives, and project organization.</li>
+          <li><strong>Chapter 2 — Literature Survey:</strong> Analysis of 3–5 related existing tools and their drawbacks.</li>
+          <li><strong>Chapter 3 — System Requirements & Design:</strong> Hardware/Software specifications, DFD (Data Flow Diagrams), and UI wireframes.</li>
+          <li><strong>Chapter 4 — Implementation & Modules:</strong> Code snippets, algorithms, and modular breakdown.</li>
+          <li><strong>Chapter 5 — Testing & Results:</strong> Test case table (Inputs, Expected, Actual Output, Status) and UI screenshots.</li>
+          <li><strong>Chapter 6 — Conclusion & Future Scope:</strong> Summary and potential enhancements.</li>
+          <li><strong>References & Appendices:</strong> IEEE cited papers, online docs, and source code excerpts.</li>
+        </ol>`,
+        suggestions: [
+          "What are the main modules of a college project?",
+          "How do I prepare a project presentation?",
+          "Suggest college project ideas"
+        ]
+      },
+      {
+        id: "project_modules",
+        topic: "projects",
+        keywords: ["what are the main modules of a college project", "main modules of a college project", "project modules", "modules of a project", "college project modules"],
+        title: "Main Modules of a College Project",
+        answer: `<p>Most strong software engineering projects are decomposed into 4 standard core modules:</p>
+        <ul>
+          <li><strong>1. User / Authentication & Profile Module:</strong> Captures user credentials, preferences, roles (Admin vs Student), and session state.</li>
+          <li><strong>2. Core Business Logic / Engine Module:</strong> The primary algorithm or workflow (e.g. quiz scoring rules, attendance calculation, budget aggregation, recommendation filtering).</li>
+          <li><strong>3. Data Storage & Persistence Module:</strong> Responsible for creating, reading, updating, and deleting records (CRUD) in LocalStorage, IndexedDB, or SQL databases.</li>
+          <li><strong>4. Dashboard, Analytics & Reporting Module:</strong> Visualizes metrics, charts, progress bars, and supports CSV/PDF export for administrative reporting.</li>
+        </ul>`,
+        suggestions: [
+          "How do I choose a project?",
+          "How do I write a project report?",
+          "Suggest college project ideas"
+        ]
+      },
+
+      // TOPIC G: PERSONALIZED LEARNING & PATHS
+      {
+        id: "learning_path",
+        topic: "personalized",
+        keywords: ["what should i learn next", "can you recommend a learning path", "learning path", "roadmap", "what to learn"],
+        title: "Recommended Learning Path",
+        answer: `<p>Here is the proven, step-by-step roadmap for modern software and web development:</p>
+        <ol>
+          <li><strong>Phase 1: Web Foundations (Weeks 1–3)</strong>
+            <br>Learn semantic HTML5 markup and modern CSS3 (Box Model, Flexbox, Responsive Design).
+          </li>
+          <li><strong>Phase 2: Programming Logic & DOM (Weeks 4–7)</strong>
+            <br>Master JavaScript variables, functions, array methods, DOM manipulation, and event handling.
+          </li>
+          <li><strong>Phase 3: Version Control & Collaboration (Weeks 8–9)</strong>
+            <br>Learn Git commands (clone, branch, commit, push) and host web projects live on GitHub Pages.
+          </li>
+          <li><strong>Phase 4: Capstone Projects & Hackathons (Weeks 10+)</strong>
+            <br>Build multi-page interactive applications, participate in hackathons, and publish your portfolio.
+          </li>
+        </ol>
+        <p><em>Want to assess your current level?</em> Take our 10-question quiz in the <strong>Quiz Arena</strong> tab!</p>`,
+        suggestions: [
+          "Test my HTML knowledge",
+          "Test my JavaScript knowledge",
+          "What are my weak topics?"
+        ]
+      },
+      {
+        id: "practice_questions",
+        topic: "personalized",
+        keywords: ["give me practice questions", "practice questions", "practice exercises", "coding exercises"],
+        title: "Hands-on Practice Exercises",
+        answer: `<p>Try implementing these practical mini-challenges right now in a local test file:</p>
+        <ul>
+          <li><strong>HTML Challenge:</strong> Create a registration form with Name, Email, Password, Course selection, and a Submit button with semantic labels.</li>
+          <li><strong>CSS Challenge:</strong> Build a 3-column pricing or feature card layout that collapses into a single column on mobile screens using Flexbox or CSS Grid.</li>
+          <li><strong>JavaScript Challenge:</strong> Create an interactive counter with [+] and [-] buttons and dynamic background color changes when reaching multiples of 10.</li>
+        </ul>
+        <p>You can also click over to the <strong>Quiz Arena</strong> tab to test your theoretical understanding!</p>`,
+        suggestions: [
+          "Test my HTML knowledge",
+          "Test my CSS knowledge",
+          "Test my JavaScript knowledge"
+        ]
+      },
+      {
+        id: "test_knowledge_trigger",
+        topic: "personalized",
+        keywords: ["test my html knowledge", "test my css knowledge", "test my javascript knowledge", "take a quiz", "test my knowledge", "quiz me"],
+        title: "Interactive Assessment",
+        answer: `<p>I'd love to test your knowledge! 🎯</p>
+        <p>I have prepared a dedicated <strong>Interactive Learning Quiz Arena</strong> with questions spanning HTML, CSS, and JavaScript. You will get instant explanations for every option and a personalized scorecard!</p>
+        <p><button class="btn-action-primary" onclick="switchView('quizView'); startQuiz();" style="margin-top: 8px;">🚀 Launch Quiz Arena Now</button></p>`,
+        suggestions: [
+          "What are my weak topics?",
+          "Can you recommend a learning path?",
+          "Suggest college project ideas"
+        ]
+      },
+      {
+        id: "weak_topics_query",
+        topic: "personalized",
+        keywords: ["what are my weak topics", "my weak topics", "where should i improve", "my weaknesses"],
+        title: "Personalized Diagnostic",
+        answer: `<p>Let's check your current quiz records stored in your browser:</p>
+        <div id="inlineWeaknessReport">Loading diagnostic...</div>`,
+        dynamicRenderer: "renderWeaknessDiagnostic",
+        suggestions: [
+          "Test my HTML knowledge",
+          "Can you recommend a learning path?",
+          "Suggest beginner-friendly projects"
+        ]
+      }
+    ];
+
+    /* =========================================================
+       2. APPLICATION STATE MANAGEMENT & LOCAL STORAGE
+       ========================================================= */
+    const STORAGE_KEY_CHAT = "learnsmart_chat_history_v1";
+    const STORAGE_KEY_QUIZ = "learnsmart_quiz_history_v1";
+    const STORAGE_KEY_PROFILE = "learnsmart_student_profile_v1";
+    const STORAGE_KEY_THEME = "learnsmart_theme_v1";
+
+    let appState = {
+      theme: "light",
+      activeView: "chatView",
+      studentProfile: {
+        name: "Student Learner",
+        goal: "webdev",
+        level: "beginner"
+      },
+      chatHistory: [],
+      quizSessions: [],
+      // Active Quiz State
+      activeQuiz: {
+        categoryFilter: "all",
+        questions: [],
+        currentIndex: 0,
+        selectedAnswers: {}, // { questionIndex: optionIndex }
+        isCompleted: false,
+        score: 0
+      }
+    };
+
+    // Load state from localStorage on init
+    function loadPersistedState() {
+      // 1. Theme
+      const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
+      if (savedTheme) {
+        appState.theme = savedTheme;
+        applyTheme(savedTheme);
+      }
+
+      // 2. Profile
+      const savedProfile = localStorage.getItem(STORAGE_KEY_PROFILE);
+      if (savedProfile) {
+        try {
+          appState.studentProfile = JSON.parse(savedProfile);
+        } catch (e) {
+          console.error("Error parsing profile", e);
+        }
+      }
+
+      // 3. Quiz Sessions
+      const savedQuiz = localStorage.getItem(STORAGE_KEY_QUIZ);
+      if (savedQuiz) {
+        try {
+          appState.quizSessions = JSON.parse(savedQuiz);
+        } catch (e) {
+          console.error("Error parsing quiz history", e);
+        }
+      }
+
+      // 4. Chat History
+      const savedChat = localStorage.getItem(STORAGE_KEY_CHAT);
+      if (savedChat) {
+        try {
+          appState.chatHistory = JSON.parse(savedChat);
+        } catch (e) {
+          console.error("Error parsing chat history", e);
+        }
+      }
+    }
+
+    function saveState(key) {
+      if (key === "chat" || !key) {
+        localStorage.setItem(STORAGE_KEY_CHAT, JSON.stringify(appState.chatHistory));
+      }
+      if (key === "quiz" || !key) {
+        localStorage.setItem(STORAGE_KEY_QUIZ, JSON.stringify(appState.quizSessions));
+      }
+      if (key === "profile" || !key) {
+        localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(appState.studentProfile));
+      }
+      if (key === "theme" || !key) {
+        localStorage.setItem(STORAGE_KEY_THEME, appState.theme);
+      }
+    }
+
+    /* =========================================================
+       3. DOM ELEMENTS & INITIALIZATION
+       ========================================================= */
+    const chatMessagesEl = document.getElementById("chatMessages");
+    const welcomeBannerEl = document.getElementById("welcomeBanner");
+    const userInputEl = document.getElementById("userInput");
+    const chatFormEl = document.getElementById("chatForm");
+    const sendBtnEl = document.getElementById("sendBtn");
+    const typingIndicatorEl = document.getElementById("typingIndicator");
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+    const themeIcon = document.getElementById("themeIcon");
+    const clearChatBtn = document.getElementById("clearChatBtn");
+    const confirmModalEl = document.getElementById("confirmModal");
+    const modalConfirmBtn = document.getElementById("modalConfirmBtn");
+    const modalCancelBtn = document.getElementById("modalCancelBtn");
+    const toastNoticeEl = document.getElementById("toastNotice");
+    const toastMessageEl = document.getElementById("toastMessage");
+
+    // Profile inputs
+    const profileFormEl = document.getElementById("profileForm");
+    const studentNameInput = document.getElementById("studentNameInput");
+    const studentGoalSelect = document.getElementById("studentGoalSelect");
+    const studentLevelSelect = document.getElementById("studentLevelSelect");
+    const profileDisplayName = document.getElementById("profileDisplayName");
+    const profileDisplayGoal = document.getElementById("profileDisplayGoal");
+    const btnResetAllProgress = document.getElementById("btnResetAllProgress");
+
+    // Navigation tab buttons
+    const navTabButtons = document.querySelectorAll(".nav-tab-btn");
+    const viewPanels = document.querySelectorAll(".view-panel");
+
+    // Quiz elements
+    const quizActiveCard = document.getElementById("quizActiveCard");
+    const quizResultsCard = document.getElementById("quizResultsCard");
+    const quizCategoryBadge = document.getElementById("quizCategoryBadge");
+    const quizCounterText = document.getElementById("quizCounterText");
+    const quizQuestionText = document.getElementById("quizQuestionText");
+    const quizOptionsContainer = document.getElementById("quizOptionsContainer");
+    const quizFeedbackBox = document.getElementById("quizFeedbackBox");
+    const quizNextBtn = document.getElementById("quizNextBtn");
+    const quizProgressBar = document.getElementById("quizProgressBar");
+    const btnRestartQuiz = document.getElementById("btnRestartQuiz");
+    const btnQuizBackToChat = document.getElementById("btnQuizBackToChat");
+    const categoryFilterBtns = document.querySelectorAll(".category-filter-btn");
+
+    // Initialize application on DOM ready
+    window.addEventListener("DOMContentLoaded", () => {
+      loadPersistedState();
+      syncProfileUI();
+      renderChatHistory();
+      initQuiz();
+      updateDashboardUI();
+
+      // Handle textarea auto-height & enter key
+      userInputEl.addEventListener("input", autoResizeTextarea);
+      userInputEl.addEventListener("keydown", handleKeyDown);
+
+      // Listen for view tab clicks
+      navTabButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const viewId = btn.getAttribute("data-view");
+          switchView(viewId);
+        });
+      });
+
+      // Quick chip clicks & welcome card clicks
+      document.addEventListener("click", (e) => {
+        const target = e.target.closest("[data-query]");
+        if (target) {
+          const query = target.getAttribute("data-query");
+          if (query) {
+            switchView("chatView");
+            submitUserMessage(query);
+          }
+        }
+      });
+    });
+
+    /* =========================================================
+       4. THEME & VIEW SWITCHING
+       ========================================================= */
+    function applyTheme(theme) {
+      if (theme === "dark") {
+        document.body.classList.add("dark-mode");
+        themeIcon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+      } else {
+        document.body.classList.remove("dark-mode");
+        themeIcon.innerHTML = `<circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>`;
+      }
+    }
+
+    themeToggleBtn.addEventListener("click", () => {
+      appState.theme = appState.theme === "light" ? "dark" : "light";
+      applyTheme(appState.theme);
+      saveState("theme");
+      showToast(`Switched to ${appState.theme} mode`);
+    });
+
+    function switchView(viewId) {
+      appState.activeView = viewId;
+      navTabButtons.forEach(btn => {
+        if (btn.getAttribute("data-view") === viewId) {
+          btn.classList.add("active");
+        } else {
+          btn.classList.remove("active");
+        }
+      });
+
+      viewPanels.forEach(panel => {
+        if (panel.id === viewId) {
+          panel.classList.add("active");
+        } else {
+          panel.classList.remove("active");
+        }
+      });
+
+      if (viewId === "dashboardView") {
+        updateDashboardUI();
+      }
+    }
+    window.switchView = switchView;
+
+    /* =========================================================
+       5. CHATBOT ENGINE & RULE-BASED MATCHING
+       ========================================================= */
+
+    // Formats plain text time string e.g. "10:15 AM"
+    function formatTime(timestamp) {
+      const date = timestamp ? new Date(timestamp) : new Date();
+      return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function autoResizeTextarea() {
+      userInputEl.style.height = "auto";
+      userInputEl.style.height = Math.min(userInputEl.scrollHeight, 120) + "px";
+    }
+
+    function handleKeyDown(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        chatFormEl.dispatchEvent(new Event("submit"));
+      }
+    }
+
+    chatFormEl.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = userInputEl.value.trim();
+      if (!text) return;
+      submitUserMessage(text);
+      userInputEl.value = "";
+      autoResizeTextarea();
+    });
+
+    function submitUserMessage(rawText) {
+      if (!rawText.trim()) return;
+
+      // 1. Hide welcome banner once conversation begins
+      if (welcomeBannerEl) {
+        welcomeBannerEl.style.display = "none";
+      }
+
+      const timestamp = new Date().toISOString();
+      const userMessageObj = {
+        sender: "user",
+        text: rawText,
+        time: timestamp
+      };
+
+      // Push to chat state & append to DOM
+      appState.chatHistory.push(userMessageObj);
+      saveState("chat");
+      appendMessageToDOM(userMessageObj);
+      scrollToLatestMessage();
+
+      // 2. Show Typing Indicator and compute response
+      showTypingIndicator(true);
+
+      const delay = Math.floor(Math.random() * 250) + 400; // 400 - 650ms natural feeling
+      setTimeout(() => {
+        showTypingIndicator(false);
+        const botResponse = generateBotResponse(rawText);
+        
+        const botMessageObj = {
+          sender: "bot",
+          htmlContent: botResponse.html,
+          suggestions: botResponse.suggestions || [],
+          time: new Date().toISOString()
+        };
+
+        appState.chatHistory.push(botMessageObj);
+        saveState("chat");
+        appendMessageToDOM(botMessageObj);
+        scrollToLatestMessage();
+      }, delay);
+    }
+
+    function showTypingIndicator(show) {
+      if (show) {
+        typingIndicatorEl.classList.add("active");
+      } else {
+        typingIndicatorEl.classList.remove("active");
+      }
+      scrollToLatestMessage();
+    }
+
+    function scrollToLatestMessage() {
+      chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+    }
+
+    // Rule-Based Natural Language Matcher
+    function generateBotResponse(userPrompt) {
+      const cleanInput = userPrompt.toLowerCase().replace(/[?!.,'"]/g, " ").trim();
+      const studentName = appState.studentProfile.name || "friend";
+
+      // 1. Greetings matching
+      const greetings = ["hi", "hello", "hey", "good morning", "good evening", "greetings", "hola", "yo"];
+      const isGreeting = greetings.some(g => {
+        const regex = new RegExp(`(^|\\s)${g}(\\s|$)`, "i");
+        return regex.test(cleanInput);
+      });
+
+      if (isGreeting && cleanInput.split(" ").length <= 4) {
+        return {
+          html: `<p>Hello ${escapeHTML(studentName)}! 👋 It is fantastic to have you here.</p>
+                 <p>I am your personal learning assistant. What topic shall we explore together today?</p>
+                 <ul>
+                   <li><strong>Hackathons:</strong> Preparation, project ideas, team pitching</li>
+                   <li><strong>GitHub:</strong> Commits, repositories, GitHub Pages free hosting</li>
+                   <li><strong>Frontend Tech:</strong> HTML, CSS, JavaScript fundamentals</li>
+                   <li><strong>College Projects:</strong> Capstones, beginner modules, reports</li>
+                 </ul>`,
+          suggestions: [
+            "What is a hackathon?",
+            "How do I use GitHub?",
+            "Suggest college projects"
+          ]
+        };
+      }
+
+      // 2. Score matching against predefined Knowledge Base
+      let bestMatch = null;
+      let highestScore = 0;
+
+      for (const entry of KNOWLEDGE_BASE) {
+        let entryScore = 0;
+
+        for (const kw of entry.keywords) {
+          const cleanKw = kw.toLowerCase().replace(/[?!.,'"]/g, " ").trim();
+
+          // Exact keyword phrase match (huge weight)
+          if (cleanInput.includes(cleanKw)) {
+            entryScore += 10;
+          } else {
+            // Word intersection score
+            const kwWords = cleanKw.split(" ");
+            const matchedWords = kwWords.filter(w => w.length > 2 && cleanInput.includes(w));
+            if (matchedWords.length === kwWords.length) {
+              entryScore += 6;
+            } else if (matchedWords.length > 0) {
+              entryScore += matchedWords.length * 1.5;
+            }
+          }
+        }
+
+        if (entryScore > highestScore) {
+          highestScore = entryScore;
+          bestMatch = entry;
+        }
+      }
+
+      // 3. If confident match found (threshold >= 3.0)
+      if (bestMatch && highestScore >= 3.0) {
+        let content = bestMatch.answer;
+
+        // Dynamic rendering handler if specified
+        if (bestMatch.dynamicRenderer === "renderWeaknessDiagnostic") {
+          content = buildWeaknessDiagnosticHTML();
+        }
+
+        return {
+          html: content,
+          suggestions: bestMatch.suggestions || []
+        };
+      }
+
+      // 4. Fallback response for unhandled questions (as specified in megprompt)
+      return {
+        html: `<p>I'm still learning about that topic! 😊 I can help you with hackathons, GitHub, HTML, CSS, JavaScript, and college projects. Try asking me one of these questions:</p>`,
+        suggestions: [
+          "What is a hackathon?",
+          "How do I use GitHub?",
+          "Explain HTML vs CSS",
+          "Suggest college projects",
+          "Test my JavaScript knowledge"
+        ]
+      };
+    }
+
+    // Build Weakness Diagnostic from real localStorage
+    function buildWeaknessDiagnosticHTML() {
+      const stats = calculateUserStats();
+      if (stats.quizzesCount === 0) {
+        return `<div class="bot-card">
+                  <p><strong>No quiz data recorded yet!</strong></p>
+                  <p>I have not observed any of your quiz answers yet. Once you take a quick 5-question test in the <strong>Quiz Arena</strong>, I will identify your strong topics and pinpoint the exact areas you should review!</p>
+                  <button class="btn-action-primary" onclick="switchView('quizView'); startQuiz();" style="margin-top: 8px;">Take Quiz Now</button>
+                </div>`;
+      }
+
+      const weakest = stats.weakestTopic;
+      const strongest = stats.strongestTopic;
+
+      return `<div class="bot-card">
+                <p><strong>Your Current Diagnostic Report:</strong></p>
+                <ul>
+                  <li><strong>Total Quizzes Completed:</strong> ${stats.quizzesCount}</li>
+                  <li><strong>Average Score:</strong> ${stats.averageScore}%</li>
+                  <li><strong>Strongest Topic:</strong> <span style="color: var(--success); font-weight: 700;">${strongest}</span></li>
+                  <li><strong>Topic Requiring Revision:</strong> <span style="color: var(--danger); font-weight: 700;">${weakest}</span></li>
+                </ul>
+                <p style="margin-top: 8px;"><strong>Suggested Next Action:</strong> Ask me <em>"Explain ${weakest}"</em> or <em>"Test my ${weakest} knowledge"</em> to build your confidence!</p>
+              </div>`;
+    }
+
+    // Appends a single message (user or bot) to the DOM
+    function appendMessageToDOM(msgObj) {
+      const row = document.createElement("div");
+      row.className = `message-row ${msgObj.sender}`;
+
+      const avatar = document.createElement("div");
+      avatar.className = `avatar ${msgObj.sender}-avatar`;
+      avatar.textContent = msgObj.sender === "user" ? "🎓" : "🤖";
+
+      const contentWrap = document.createElement("div");
+      contentWrap.className = "message-content-wrap";
+
+      const bubble = document.createElement("div");
+      bubble.className = "message-bubble";
+
+      if (msgObj.sender === "user") {
+        // Safe text rendering to prevent XSS
+        bubble.textContent = msgObj.text;
+      } else {
+        // Predefined safe HTML template
+        bubble.innerHTML = msgObj.htmlContent;
+
+        // Render follow-up suggestions if available
+        if (msgObj.suggestions && msgObj.suggestions.length > 0) {
+          const suggestionsBox = document.createElement("div");
+          suggestionsBox.className = "follow-up-suggestions";
+          msgObj.suggestions.slice(0, 3).forEach(suggestionText => {
+            const pill = document.createElement("button");
+            pill.className = "suggestion-pill";
+            pill.textContent = suggestionText;
+            pill.setAttribute("data-query", suggestionText);
+            suggestionsBox.appendChild(pill);
+          });
+          bubble.appendChild(suggestionsBox);
+        }
+      }
+
+      const timestamp = document.createElement("span");
+      timestamp.className = "message-timestamp";
+      timestamp.textContent = formatTime(msgObj.time);
+
+      contentWrap.appendChild(bubble);
+      contentWrap.appendChild(timestamp);
+
+      row.appendChild(avatar);
+      row.appendChild(contentWrap);
+      chatMessagesEl.appendChild(row);
+
+      // Attach copy code button listeners
+      row.querySelectorAll(".copy-code-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const codeEl = btn.closest(".code-block-wrapper").querySelector(".code-block");
+          if (codeEl) {
+            navigator.clipboard.writeText(codeEl.textContent).then(() => {
+              btn.textContent = "Copied! ✓";
+              setTimeout(() => { btn.textContent = "Copy"; }, 2000);
+            });
+          }
+        });
+      });
+    }
+
+    function renderChatHistory() {
+      // Clear existing messages except welcome if empty
+      chatMessagesEl.querySelectorAll(".message-row").forEach(el => el.remove());
+
+      if (appState.chatHistory && appState.chatHistory.length > 0) {
+        welcomeBannerEl.style.display = "none";
+        appState.chatHistory.forEach(msg => appendMessageToDOM(msg));
+        scrollToLatestMessage();
+      } else {
+        welcomeBannerEl.style.display = "block";
+      }
+    }
+
+    // Helper to sanitize text strings
+    function escapeHTML(str) {
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    /* =========================================================
+       6. CLEAR CONVERSATION & MODAL
+       ========================================================= */
+    clearChatBtn.addEventListener("click", () => {
+      confirmModalEl.classList.add("active");
+    });
+
+    modalCancelBtn.addEventListener("click", () => {
+      confirmModalEl.classList.remove("active");
+    });
+
+    modalConfirmBtn.addEventListener("click", () => {
+      appState.chatHistory = [];
+      saveState("chat");
+      renderChatHistory();
+      confirmModalEl.classList.remove("active");
+      showToast("Chat conversation cleared!");
+    });
+
+    function showToast(message) {
+      toastMessageEl.textContent = message;
+      toastNoticeEl.classList.add("show");
+      setTimeout(() => {
+        toastNoticeEl.classList.remove("show");
+      }, 2600);
+    }
+
+    /* =========================================================
+       7. INTERACTIVE QUIZ ENGINE & PROGRESSION
+       ========================================================= */
+    function startQuiz(category = "all") {
+      initQuiz(category);
+    }
+    window.startQuiz = startQuiz;
+
+    function initQuiz(category = "all") {
+      appState.activeQuiz.categoryFilter = category;
+
+      // Filter questions based on topic
+      let pool = QUIZ_DATABASE;
+      if (category !== "all") {
+        pool = QUIZ_DATABASE.filter(q => q.category === category);
+      }
+
+      // Shuffle question pool for variety
+      appState.activeQuiz.questions = [...pool].sort(() => 0.5 - Math.random());
+      appState.activeQuiz.currentIndex = 0;
+      appState.activeQuiz.selectedAnswers = {};
+      appState.activeQuiz.isCompleted = false;
+      appState.activeQuiz.score = 0;
+
+      quizActiveCard.style.display = "block";
+      quizResultsCard.style.display = "none";
+
+      renderQuizQuestion();
+    }
+
+    // Category Filter Buttons in Quiz View
+    categoryFilterBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        categoryFilterBtns.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const cat = btn.getAttribute("data-cat");
+        initQuiz(cat);
+      });
+    });
+
+    function renderQuizQuestion() {
+      const qState = appState.activeQuiz;
+      const currentQ = qState.questions[qState.currentIndex];
+
+      if (!currentQ) return;
+
+      const total = qState.questions.length;
+      const currentNumber = qState.currentIndex + 1;
+
+      // Update counters & progress
+      quizCategoryBadge.textContent = `Topic: ${currentQ.categoryLabel}`;
+      quizCounterText.textContent = `Question ${currentNumber} of ${total}`;
+      quizQuestionText.textContent = currentQ.question;
+      quizProgressBar.style.width = `${((currentNumber - 1) / total) * 100}%`;
+
+      // Reset feedback and next button
+      quizFeedbackBox.style.display = "none";
+      quizFeedbackBox.className = "quiz-feedback-box";
+      quizNextBtn.style.display = "none";
+
+      // Render Options
+      quizOptionsContainer.innerHTML = "";
+      const letters = ["A", "B", "C", "D"];
+
+      currentQ.options.forEach((optText, index) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `<span class="option-letter">${letters[index]}</span> <span>${escapeHTML(optText)}</span>`;
+
+        btn.addEventListener("click", () => handleOptionSelection(index, currentQ));
+        quizOptionsContainer.appendChild(btn);
+      });
+    }
+
+    function handleOptionSelection(selectedIndex, question) {
+      const qState = appState.activeQuiz;
+      const isAlreadyAnswered = qState.selectedAnswers[qState.currentIndex] !== undefined;
+      if (isAlreadyAnswered) return;
+
+      qState.selectedAnswers[qState.currentIndex] = selectedIndex;
+
+      const allOptionBtns = quizOptionsContainer.querySelectorAll(".option-btn");
+      allOptionBtns.forEach(b => b.disabled = true);
+
+      const isCorrect = selectedIndex === question.correctIndex;
+      if (isCorrect) {
+        qState.score++;
+        allOptionBtns[selectedIndex].classList.add("correct");
+        quizFeedbackBox.className = "quiz-feedback-box correct";
+        quizFeedbackBox.innerHTML = `<strong>Correct! 🎉</strong> ${escapeHTML(question.explanation)}`;
+      } else {
+        allOptionBtns[selectedIndex].classList.add("incorrect");
+        allOptionBtns[question.correctIndex].classList.add("correct");
+        quizFeedbackBox.className = "quiz-feedback-box incorrect";
+        quizFeedbackBox.innerHTML = `<strong>Incorrect.</strong> ${escapeHTML(question.explanation)}`;
+      }
+
+      quizFeedbackBox.style.display = "block";
+      quizNextBtn.style.display = "inline-block";
+
+      const isLast = qState.currentIndex + 1 >= qState.questions.length;
+      quizNextBtn.innerHTML = isLast ? "View Final Results &rarr;" : "Next Question &rarr;";
+    }
+
+    quizNextBtn.addEventListener("click", () => {
+      const qState = appState.activeQuiz;
+      if (qState.currentIndex + 1 < qState.questions.length) {
+        qState.currentIndex++;
+        renderQuizQuestion();
+      } else {
+        completeQuiz();
+      }
+    });
+
+    function completeQuiz() {
+      const qState = appState.activeQuiz;
+      qState.isCompleted = true;
+      quizProgressBar.style.width = "100%";
+
+      const totalQuestions = qState.questions.length;
+      const correctCount = qState.score;
+      const percentage = Math.round((correctCount / totalQuestions) * 100);
+
+      // Compute topic-specific scores
+      const topicStats = {
+        html: { total: 0, correct: 0 },
+        css: { total: 0, correct: 0 },
+        javascript: { total: 0, correct: 0 }
+      };
+
+      const missedTopics = [];
+
+      qState.questions.forEach((q, idx) => {
+        const userChoice = qState.selectedAnswers[idx];
+        const isRight = userChoice === q.correctIndex;
+        if (topicStats[q.category]) {
+          topicStats[q.category].total++;
+          if (isRight) {
+            topicStats[q.category].correct++;
+          } else {
+            missedTopics.push(q.category);
+          }
+        }
+      });
+
+      // Save session to localStorage
+      const sessionRecord = {
+        date: new Date().toISOString(),
+        category: qState.categoryFilter,
+        total: totalQuestions,
+        correct: correctCount,
+        percentage: percentage,
+        topicBreakdown: topicStats,
+        missedCategories: missedTopics
+      };
+
+      appState.quizSessions.push(sessionRecord);
+      saveState("quiz");
+
+      // Render Results Screen
+      quizActiveCard.style.display = "none";
+      quizResultsCard.style.display = "block";
+
+      document.getElementById("resultPercentage").textContent = `${percentage}%`;
+      document.getElementById("resultSummary").textContent = `You correctly answered ${correctCount} out of ${totalQuestions} questions.`;
+
+      // Headline by tier
+      const headlineEl = document.getElementById("resultHeadline");
+      if (percentage >= 80) {
+        headlineEl.textContent = "Outstanding Performance! 🏆";
+      } else if (percentage >= 50) {
+        headlineEl.textContent = "Good Effort! Keep Growing 👍";
+      } else {
+        headlineEl.textContent = "Foundation Needed — Keep Practicing 📚";
+      }
+
+      // Breakdown display
+      document.getElementById("breakdownHtmlScore").textContent = 
+        topicStats.html.total > 0 ? `${Math.round((topicStats.html.correct / topicStats.html.total) * 100)}%` : "N/A";
+      document.getElementById("breakdownCssScore").textContent = 
+        topicStats.css.total > 0 ? `${Math.round((topicStats.css.correct / topicStats.css.total) * 100)}%` : "N/A";
+      document.getElementById("breakdownJsScore").textContent = 
+        topicStats.javascript.total > 0 ? `${Math.round((topicStats.javascript.correct / topicStats.javascript.total) * 100)}%` : "N/A";
+
+      // Build Personalized Recommendations
+      renderQuizRecommendations(percentage, topicStats, missedTopics);
+      updateDashboardUI();
+    }
+
+    // Recommendation Rule Engine (Section 10)
+    function renderQuizRecommendations(percentage, topicStats, missedTopics) {
+      const container = document.getElementById("quizRecommendationsList");
+      container.innerHTML = "";
+
+      const recommendations = [];
+
+      // Rule 1: Overall percentage tier
+      if (percentage < 50) {
+        recommendations.push({
+          topic: "Foundational Web Core",
+          difficulty: "Beginner",
+          badgeClass: "badge-easy",
+          reason: "Overall score is under 50%. Building solid mental models of HTML & CSS syntax is your highest-leverage task.",
+          activity: "Review Semantic HTML & Basic CSS Box Model",
+          query: "Explain HTML"
+        });
+      } else if (percentage >= 50 && percentage < 80) {
+        recommendations.push({
+          topic: "Intermediate Layouts & Logic",
+          difficulty: "Intermediate",
+          badgeClass: "badge-medium",
+          reason: "You possess solid foundational skills (50%–79%). Reinforce layout mechanics and functional DOM interactions.",
+          activity: "Deep dive into Flexbox alignments & Event Listeners",
+          query: "What is Flexbox?"
+        });
+      } else {
+        recommendations.push({
+          topic: "Advanced Application Building",
+          difficulty: "Advanced",
+          badgeClass: "badge-hard",
+          reason: "Mastery demonstrated (80%+). You are ready for architecture design, hackathon prototyping, and capstones.",
+          activity: "Build an interactive client-side college project",
+          query: "Suggest college projects"
+        });
+      }
+
+      // Rule 2: Check category-specific deficiencies
+      if (topicStats.javascript.total > 0 && (topicStats.javascript.correct / topicStats.javascript.total) < 0.6) {
+        recommendations.push({
+          topic: "JavaScript DOM & Functions",
+          difficulty: "Intermediate",
+          badgeClass: "badge-medium",
+          reason: "You missed key JavaScript questions. Strengthening functions and DOM selectors will accelerate your apps.",
+          activity: "Practice form validation and event listeners",
+          query: "How do I validate a form using JavaScript?"
+        });
+      }
+
+      if (topicStats.css.total > 0 && (topicStats.css.correct / topicStats.css.total) < 0.6) {
+        recommendations.push({
+          topic: "CSS Box Model & Responsive Design",
+          difficulty: "Beginner",
+          badgeClass: "badge-easy",
+          reason: "CSS layout questions presented a challenge. Mastering padding vs margin and media queries will remove friction.",
+          activity: "Review CSS Box Model and media queries",
+          query: "What is the box model?"
+        });
+      }
+
+      recommendations.forEach(rec => {
+        const card = document.createElement("div");
+        card.className = "recommendation-card";
+        card.innerHTML = `
+          <div class="rec-top-row">
+            <span class="rec-topic-title">${escapeHTML(rec.topic)}</span>
+            <span class="badge ${rec.badgeClass}">${escapeHTML(rec.difficulty)}</span>
+          </div>
+          <div class="rec-reason">${escapeHTML(rec.reason)}</div>
+          <div class="rec-action-row">
+            <span class="rec-activity">Activity: ${escapeHTML(rec.activity)}</span>
+            <button class="btn-start-learning" data-query="${escapeHTML(rec.query)}">Start Learning &rarr;</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    btnRestartQuiz.addEventListener("click", () => {
+      initQuiz(appState.activeQuiz.categoryFilter);
+    });
+
+    btnQuizBackToChat.addEventListener("click", () => {
+      switchView("chatView");
+    });
+
+    /* =========================================================
+       8. DASHBOARD ANALYTICS ENGINE
+       ========================================================= */
+    function calculateUserStats() {
+      const sessions = appState.quizSessions || [];
+      if (sessions.length === 0) {
+        return {
+          questionsCount: 0,
+          quizzesCount: 0,
+          averageScore: 0,
+          strongestTopic: "No data",
+          weakestTopic: "No data",
+          htmlPct: 0,
+          cssPct: 0,
+          jsPct: 0
+        };
+      }
+
+      let totalQuestions = 0;
+      let totalCorrect = 0;
+      let sumPercentages = 0;
+
+      const catTotals = {
+        html: { total: 0, correct: 0 },
+        css: { total: 0, correct: 0 },
+        javascript: { total: 0, correct: 0 }
+      };
+
+      sessions.forEach(s => {
+        totalQuestions += s.total;
+        totalCorrect += s.correct;
+        sumPercentages += s.percentage;
+
+        if (s.topicBreakdown) {
+          ['html', 'css', 'javascript'].forEach(c => {
+            if (s.topicBreakdown[c]) {
+              catTotals[c].total += s.topicBreakdown[c].total;
+              catTotals[c].correct += s.topicBreakdown[c].correct;
+            }
+          });
+        }
+      });
+
+      const avgScore = Math.round(sumPercentages / sessions.length);
+
+      const htmlPct = catTotals.html.total > 0 ? Math.round((catTotals.html.correct / catTotals.html.total) * 100) : 0;
+      const cssPct = catTotals.css.total > 0 ? Math.round((catTotals.css.correct / catTotals.css.total) * 100) : 0;
+      const jsPct = catTotals.javascript.total > 0 ? Math.round((catTotals.javascript.correct / catTotals.javascript.total) * 100) : 0;
+
+      // Determine strongest and weakest
+      const topics = [
+        { name: "HTML", pct: htmlPct, attempted: catTotals.html.total },
+        { name: "CSS", pct: cssPct, attempted: catTotals.css.total },
+        { name: "JavaScript", pct: jsPct, attempted: catTotals.javascript.total }
+      ].filter(t => t.attempted > 0);
+
+      let strongest = "Balanced";
+      let weakest = "None yet";
+
+      if (topics.length > 0) {
+        topics.sort((a, b) => b.pct - a.pct);
+        strongest = `${topics[0].name} (${topics[0].pct}%)`;
+        weakest = `${topics[topics.length - 1].name} (${topics[topics.length - 1].pct}%)`;
+      }
+
+      return {
+        questionsCount: totalQuestions,
+        quizzesCount: sessions.length,
+        averageScore: avgScore,
+        strongestTopic: strongest,
+        weakestTopic: weakest,
+        htmlPct,
+        cssPct,
+        jsPct
+      };
+    }
+
+    function updateDashboardUI() {
+      const stats = calculateUserStats();
+
+      document.getElementById("kpiQuestionsCount").textContent = stats.questionsCount;
+      document.getElementById("kpiQuizzesCount").textContent = stats.quizzesCount;
+      document.getElementById("kpiAverageScore").textContent = `${stats.averageScore}%`;
+      document.getElementById("kpiStrongestTopic").textContent = stats.strongestTopic;
+      document.getElementById("kpiWeakestTopic").textContent = stats.weakestTopic;
+
+      const masteryContent = document.getElementById("dashMasteryContent");
+      const masteryEmpty = document.getElementById("dashMasteryEmpty");
+      const recsList = document.getElementById("dashRecommendationsList");
+      const recsEmpty = document.getElementById("dashRecommendationsEmpty");
+
+      if (stats.quizzesCount === 0) {
+        masteryContent.style.display = "none";
+        masteryEmpty.style.display = "block";
+        recsList.style.display = "none";
+        recsEmpty.style.display = "block";
+      } else {
+        masteryContent.style.display = "block";
+        masteryEmpty.style.display = "none";
+        recsList.style.display = "block";
+        recsEmpty.style.display = "none";
+
+        // Update progress bars
+        document.getElementById("masteryHtmlPct").textContent = `${stats.htmlPct}%`;
+        document.getElementById("masteryHtmlBar").style.width = `${stats.htmlPct}%`;
+
+        document.getElementById("masteryCssPct").textContent = `${stats.cssPct}%`;
+        document.getElementById("masteryCssBar").style.width = `${stats.cssPct}%`;
+
+        document.getElementById("masteryJsPct").textContent = `${stats.jsPct}%`;
+        document.getElementById("masteryJsBar").style.width = `${stats.jsPct}%`;
+
+        // Render Dashboard Recommendations
+        recsList.innerHTML = "";
+        const dashRecs = [
+          {
+            topic: stats.weakestTopic.startsWith("None") ? "Full-Stack Project Development" : `Focus on ${stats.weakestTopic.split(" ")[0]} Mastery`,
+            difficulty: stats.averageScore < 60 ? "Beginner" : "Intermediate",
+            badgeClass: stats.averageScore < 60 ? "badge-easy" : "badge-medium",
+            reason: `Calculated from your current average quiz score of ${stats.averageScore}%. Target your revision on weaker concepts.`,
+            activity: "Explore code examples and test interactive components",
+            query: `Explain ${stats.weakestTopic.split(" ")[0]}`
+          },
+          {
+            topic: "College Capstone Project Preparation",
+            difficulty: "Intermediate",
+            badgeClass: "badge-medium",
+            reason: "Apply your frontend skills to create an academic-level project prototype.",
+            activity: "Review verified project architectures and modules",
+            query: "Suggest college projects"
+          }
+        ];
+
+        dashRecs.forEach(rec => {
+          const card = document.createElement("div");
+          card.className = "recommendation-card";
+          card.innerHTML = `
+            <div class="rec-top-row">
+              <span class="rec-topic-title">${escapeHTML(rec.topic)}</span>
+              <span class="badge ${rec.badgeClass}">${escapeHTML(rec.difficulty)}</span>
+            </div>
+            <div class="rec-reason">${escapeHTML(rec.reason)}</div>
+            <div class="rec-action-row">
+              <span class="rec-activity">Activity: ${escapeHTML(rec.activity)}</span>
+              <button class="btn-start-learning" data-query="${escapeHTML(rec.query)}">Start Learning &rarr;</button>
+            </div>
+          `;
+          recsList.appendChild(card);
+        });
+      }
+    }
+
+    document.getElementById("btnDashTakeQuiz").addEventListener("click", () => {
+      switchView("quizView");
+      initQuiz();
+    });
+
+    /* =========================================================
+       9. STUDENT PROFILE & PREFERENCES
+       ========================================================= */
+    function syncProfileUI() {
+      studentNameInput.value = appState.studentProfile.name || "";
+      studentGoalSelect.value = appState.studentProfile.goal || "webdev";
+      studentLevelSelect.value = appState.studentProfile.level || "beginner";
+
+      profileDisplayName.textContent = appState.studentProfile.name || "Student Learner";
+      const goalLabels = {
+        webdev: "Focus: Full-Stack Web Development",
+        hackathon: "Focus: Hackathon Preparation & Rapid Prototyping",
+        college: "Focus: College Capstone / Final Year Project",
+        git: "Focus: GitHub & Version Control Mastery"
+      };
+      profileDisplayGoal.textContent = goalLabels[appState.studentProfile.goal] || "Learning Companion";
+    }
+
+    profileFormEl.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const newName = studentNameInput.value.trim() || "Student Learner";
+      const newGoal = studentGoalSelect.value;
+      const newLevel = studentLevelSelect.value;
+
+      appState.studentProfile = {
+        name: newName,
+        goal: newGoal,
+        level: newLevel
+      };
+
+      saveState("profile");
+      syncProfileUI();
+      showToast("Profile preferences updated!");
+    });
+
+    btnResetAllProgress.addEventListener("click", () => {
+      if (confirm("Are you sure you want to reset all quiz scores, stats, and profile preferences? This action cannot be undone.")) {
+        localStorage.removeItem(STORAGE_KEY_QUIZ);
+        localStorage.removeItem(STORAGE_KEY_CHAT);
+        localStorage.removeItem(STORAGE_KEY_PROFILE);
+
+        appState.quizSessions = [];
+        appState.chatHistory = [];
+        appState.studentProfile = {
+          name: "Student Learner",
+          goal: "webdev",
+          level: "beginner"
+        };
+
+        syncProfileUI();
+        renderChatHistory();
+        initQuiz();
+        updateDashboardUI();
+        showToast("All learning progress has been reset!");
+      }
+    });
+
+  </script>
+</body>
+</html>
